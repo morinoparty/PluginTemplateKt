@@ -12,8 +12,10 @@ updates:
     ignore:
       # SNAPSHOT バージョンへのバンプを無視
       - dependency-name: "com.velocitypowered:velocity-api"
-        versions: ["4.0.0-SNAPSHOT"]
+        versions: ["*-SNAPSHOT"]
       - dependency-name: "io.papermc.paper:paper-api"
+        versions: ["*-SNAPSHOT"]
       - dependency-name: "com.gradleup.shadow"
         versions: ["*-SNAPSHOT"]
       - dependency-name: "org.incendo:*"
+        versions: ["*-SNAPSHOT"]
