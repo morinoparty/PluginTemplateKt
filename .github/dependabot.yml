@@ -9,3 +9,11 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    ignore:
+      # SNAPSHOT バージョンへのバンプを無視
+      - dependency-name: "com.velocitypowered:velocity-api"
+        versions: ["4.0.0-SNAPSHOT"]
+      - dependency-name: "io.papermc.paper:paper-api"
+      - dependency-name: "com.gradleup.shadow"
+        versions: ["*-SNAPSHOT"]
+      - dependency-name: "org.incendo:*"
