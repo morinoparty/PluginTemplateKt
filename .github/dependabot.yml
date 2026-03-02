@@ -9,8 +9,3 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    ignore:
-      # SNAPSHOT 依存は手動管理（Dependabot の自動バンプを無視）
-      - dependency-name: "com.velocitypowered:velocity-api"
-      - dependency-name: "io.papermc.paper:paper-api"
-      - dependency-name: "org.incendo:*"
