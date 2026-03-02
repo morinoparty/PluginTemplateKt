@@ -1,6 +1,6 @@
 [versions]
 paper = "1.21.11-R0.1-SNAPSHOT"
-velocity = "3.4.0-SNAPSHOT"
+velocity = "4.0.0-SNAPSHOT"
 kotlin = "2.3.10"
 mccoroutine = "2.22.0"
 cloud = "2.1.0-SNAPSHOT"
