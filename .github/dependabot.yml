@@ -10,12 +10,7 @@ updates:
     schedule:
       interval: "weekly"
     ignore:
-      # SNAPSHOT バージョンへのバンプを無視
+      # SNAPSHOT 依存は手動管理（Dependabot の自動バンプを無視）
       - dependency-name: "com.velocitypowered:velocity-api"
-        versions: ["*-SNAPSHOT"]
       - dependency-name: "io.papermc.paper:paper-api"
-        versions: ["*-SNAPSHOT"]
-      - dependency-name: "com.gradleup.shadow"
-        versions: ["*-SNAPSHOT"]
       - dependency-name: "org.incendo:*"
-        versions: ["*-SNAPSHOT"]
