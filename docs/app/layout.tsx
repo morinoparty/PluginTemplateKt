@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
     return (
-        <html lang="ja" suppressHydrationWarning>
+        <html lang="ja">
             <head>
                 {/* Satoshi font */}
                 <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@1&display=swap" />

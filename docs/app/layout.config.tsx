@@ -11,9 +11,9 @@ export function baseOptions(): BaseLayoutProps {
             transparentMode: "top",
         },
         themeSwitch: {
-            enabled: true,
-            mode: "light-dark",
+            enabled: false,
         },
+        modrinthUrl: "https://modrinth.com/plugin/pluginname",
         githubUrl: "https://github.com/morinoparty/PluginName",
     };
 }
