@@ -23,13 +23,15 @@ import org.koin.core.context.GlobalContext
 import org.koin.core.context.GlobalContext.getOrNull
 import org.koin.dsl.module
 import org.slf4j.Logger
+import party.morino.pluginname.common.BuildConstants
 import party.morino.pluginname.common.PluginNameCommon
 import party.morino.pluginname.velocity.commands.ExampleCommand
 
 @Plugin(
     id = "pluginname",
     name = "PluginName",
-    version = "1.0.0",
+    // バージョンは Gradle が生成する BuildConstants から取得する (gradle.properties の version と連動)
+    version = BuildConstants.VERSION,
     description = "A Minecraft plugin template",
     authors = ["morinoparty"],
 )

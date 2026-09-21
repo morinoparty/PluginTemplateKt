@@ -48,6 +48,7 @@ GitHub の "Use this template" ボタンからリポジトリを作成するか�
 # 2. パッケージ名の変更
 #    party.morino.pluginname → party.morino.myplugin
 #    ディレクトリ名も合わせてリネーム
+#    common/build.gradle.kts の basePackage も合わせて変更 (BuildConstants の生成先)
 
 # 3. クラス名の変更
 #    PluginName → MyPlugin
@@ -57,14 +58,26 @@ GitHub の "Use this template" ボタンからリポジトリを作成するか�
 # 4. 設定ファイルの更新
 #    - paper/build.gradle.kts: main クラスのパス、website URL
 #    - velocity PluginName.kt: @Plugin アノテーションの id, name
-#    - CLAUDE.md: プロジェクト名、リポジトリ URL
+#    - .agent/rules/: プロジェクト名、リポジトリ URL (CLAUDE.md / AGENTS.md は task agent で生成)
 #    - docs/app/layout.tsx: メタデータ
 #    - docs/app/layout.config.tsx: タイトル、GitHub URL
 #    - .github/workflows/preview.yml: PROJECT_NAME
 #    - .github/workflows/upload.yml: JAR ファイル名
 ```
 
-### 3. ビルド
+### 3. AI エージェント向け指示ファイルの生成
+
+`CLAUDE.md` / `AGENTS.md` は `.agent/rules/` から生成されるファイルで、git には含めていません (`.gitignore` 済み)。
+`.agent/rules/` を編集したら再生成してください。
+
+```bash
+bash .agent/build.sh
+
+# または Task を使用
+task agent
+```
+
+### 4. ビルド
 
 ```bash
 # Gradle ビルド
@@ -74,7 +87,7 @@ GitHub の "Use this template" ボタンからリポジトリを作成するか�
 task build
 ```
 
-### 4. 開発サーバー起動
+### 5. 開発サーバー起動
 
 ```bash
 # Paper テストサーバー
@@ -84,7 +97,7 @@ task build
 task run
 ```
 
-### 5. ドキュメント開発
+### 6. ドキュメント開発
 
 ```bash
 cd docs
@@ -102,11 +115,12 @@ task docs
 - [ ] リポジトリ名を変更
 - [ ] `settings.gradle.kts` の `rootProject.name` を変更
 - [ ] パッケージ名 `party.morino.pluginname` を変更
+- [ ] `common/build.gradle.kts` の `basePackage` をパッケージ名に合わせて変更
 - [ ] ソースディレクトリ名をパッケージ名に合わせてリネーム
 - [ ] クラス名 (`PluginName`, `PluginNameAPI`, `PluginNameCommon`) を変更
 - [ ] `paper/build.gradle.kts` のメインクラスパス・website を変更
 - [ ] `velocity/.../PluginName.kt` の `@Plugin` アノテーションを変更
-- [ ] `CLAUDE.md` のプロジェクト説明とリポジトリ URL を変更
+- [ ] `.agent/rules/` のプロジェクト説明とリポジトリ URL を変更し、`task agent` で `CLAUDE.md` / `AGENTS.md` を生成
 - [ ] `docs/app/layout.tsx` のメタデータを変更
 - [ ] `docs/app/layout.config.tsx` のタイトルと GitHub URL を変更
 - [ ] `docs/app/llms.txt/route.ts` のプラグイン名を変更
@@ -129,6 +143,19 @@ task docs
 | `task clear` | session.lock ファイルを削除 |
 | `task license` | ライセンスヘッダーを付与・更新 (`spotlessApply`) |
 | `task license:check` | ライセンスヘッダーを検証 (`spotlessCheck`) |
+| `task agent` | `.agent/rules/` から `CLAUDE.md` / `AGENTS.md` を生成 |
+
+## ビルド時定数 (BuildConstants)
+
+`common/build.gradle.kts` の `generateBuildConstants` タスクが、ビルドのたびに `BuildConstants.kt` を生成します。
+
+| 定数 | 値の由来 | 主な用途 |
+|------|---------|---------|
+| `BuildConstants.VERSION` | `gradle.properties` の `version` | Velocity の `@Plugin(version = ...)` |
+| `BuildConstants.KOTLIN_VERSION` | `gradle/libs.versions.toml` の `kotlin` | Paper の `PluginLoader` が解決する `kotlin-stdlib` のバージョン |
+
+いずれも `const val` なので `@Plugin` のようなアノテーション引数にそのまま使えます。
+Velocity モジュールでは kapt で `@Plugin` を処理して `velocity-plugin.json` を生成しているため、Kotlin ソースだけで Velocity プラグインとして認識されます。
 
 ## GitHub Actions
 
