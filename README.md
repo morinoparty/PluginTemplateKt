@@ -14,8 +14,8 @@ morinoparty の Minecraft プラグインテンプレートです。Paper / Velo
 ## 技術スタック
 
 - **Kotlin** - 言語
-- **Paper API** 1.21.8 - Minecraft サーバー API
-- **Velocity API** 3.4.0 - Minecraft プロキシ API
+- **Paper API** 26.2 - Minecraft サーバー API
+- **Velocity API** 4.1 - Minecraft プロキシ API
 - **Cloud** - コマンドフレームワーク (Incendo)
 - **Koin** - 依存性注入
 - **MCCoroutine** - Kotlin Coroutines の Minecraft 統合
@@ -24,9 +24,9 @@ morinoparty の Minecraft プラグインテンプレートです。Paper / Velo
 
 ## 必要環境
 
-- **Java** 21 (Temurin 推奨)
+- **Java** 25 (Temurin 推奨)
 - **Gradle** 9.x (Wrapper 同梱)
-- **Node.js** 22+ / **pnpm** 10+ (ドキュメントビルド用)
+- **Node.js** 26+ / **pnpm** 10+ (ドキュメントビルド用)
 - **[Task](https://taskfile.dev/)** (タスクランナー、任意)
 
 ## セットアップ
@@ -116,6 +116,7 @@ task docs
 - [ ] GitHub リポジトリの Settings で GitHub Pages を有効化
 - [ ] GitHub リポジトリの Secrets に S3 認証情報を設定 (プレビュー機能を使う場合)
 - [ ] 不要な初期サンプルコード (`ExampleCommand`) を削除
+- [ ] `config/spotless/license-header.kt` の著者名を変更し、`task license` でヘッダーを付け直す
 
 ## Task コマンド一覧
 
@@ -126,6 +127,8 @@ task docs
 | `task docs` | ドキュメント開発サーバーを起動 |
 | `task check` | フォーマット + ビルド |
 | `task clear` | session.lock ファイルを削除 |
+| `task license` | ライセンスヘッダーを付与・更新 (`spotlessApply`) |
+| `task license:check` | ライセンスヘッダーを検証 (`spotlessCheck`) |
 
 ## GitHub Actions
 
@@ -142,3 +145,18 @@ task docs
 ## ライセンス
 
 CC0-1.0
+
+### ライセンスヘッダー
+
+Kotlin ソースと `*.gradle.kts` には [Spotless](https://github.com/diffplug/spotless) でライセンスヘッダーを付与します。
+ヘッダー本文は `config/spotless/license-header.kt` に一元管理されており、`$YEAR` が年に置き換わります (既存ファイルは `開始年-現在年` に更新されます)。
+
+```bash
+# ヘッダーを付与・更新
+task license        # = ./gradlew spotlessApply
+
+# ヘッダーの検証のみ
+task license:check  # = ./gradlew spotlessCheck
+```
+
+`build` / `check` は失敗しない設定 (`isEnforceCheck = false`) なので、任意のタイミングで実行してください。

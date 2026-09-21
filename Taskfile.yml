@@ -31,3 +31,13 @@ tasks:
       - ./gradlew clean ktlintFormat
       - task build
     silent: false
+  license:
+    desc: Add or update license headers (spotlessApply)
+    cmds:
+      - ./gradlew spotlessApply
+    silent: false
+  license:check:
+    desc: Verify license headers (spotlessCheck)
+    cmds:
+      - ./gradlew spotlessCheck
+    silent: false
