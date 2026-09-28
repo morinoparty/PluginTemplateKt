@@ -23,6 +23,7 @@ cloud-kotlin-coroutines-annotations = { group = "org.incendo", name = "cloud-kot
 cloudPaper = { group = "org.incendo", name = "cloud-paper", version.ref = "cloudPaper" }
 cloudVelocity = { group = "org.incendo", name = "cloud-velocity", version.ref = "cloudPaper" }
 
+kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json-jvm", version.ref = "serialization" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core-jvm", version.ref = "coroutine" }
 

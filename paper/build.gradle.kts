@@ -25,6 +25,8 @@ dependencies {
     compileOnly(libs.paper.api)
 
     implementation(libs.bundles.commands.paper)
+    // cloud-kotlin-coroutines が推移的に持ち込む kotlin-reflect は古い版 (2.0.x) になるため、stdlib と同じ版にそろえる
+    implementation(libs.kotlin.reflect)
 
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.bundles.coroutines.bukkit)
