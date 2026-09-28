@@ -127,6 +127,11 @@ spotless {
         target("api/src/**/*.kt", "common/src/**/*.kt", "paper/src/**/*.kt", "velocity/src/**/*.kt")
         licenseHeaderFile(licenseHeader).updateYearWithLatest(true)
     }
+    // Paper の PluginLoader など、Kotlin 標準ライブラリより先に動く Java のクラス
+    java {
+        target("api/src/**/*.java", "common/src/**/*.java", "paper/src/**/*.java", "velocity/src/**/*.java")
+        licenseHeaderFile(licenseHeader).updateYearWithLatest(true)
+    }
     kotlinGradle {
         target("*.gradle.kts", "api/*.gradle.kts", "common/*.gradle.kts", "paper/*.gradle.kts", "velocity/*.gradle.kts")
         // .gradle.kts の最初の非ヘッダー行（build: import / settings: pluginManagement 等）を区切りとする。
