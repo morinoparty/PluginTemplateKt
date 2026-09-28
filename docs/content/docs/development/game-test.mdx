@@ -1,0 +1,56 @@
+---
+title: In-game Test
+description: fukurou を使って実際の Paper サーバーとクライアントでプラグインを動かすテスト
+---
+
+# In-game テスト (fukurou)
+
+このテンプレートでは、[fukurou](https://github.com/morinoparty/fukurou) を使って、実際の Paper サーバーとバニラクライアントでプラグインを動かすテストを GitHub Actions 上で実行します。
+ワークフローは `.github/workflows/game_test.yml` で、プルリクエストごとに実行されます。
+
+## 構成
+
+| ファイル | 役割 |
+|---------|------|
+| `.github/workflows/game_test.yml` | Paper プラグインをビルドし、fukurou でテストを実行する |
+| `game-test/fukurou.yml` | テストスイート。シナリオの場所と参加するプレイヤーを定義する |
+| `game-test/scenarios/*.json` | 1 ファイルが 1 テスト。ファイル名がテスト id になる |
+
+## 対象バージョン
+
+`paper-plugin.yml` の `apiVersion` が `26.2` のため、テスト対象は 26.2 以降のバージョンです。
+バージョンは `morinoparty/fukurou/versions` アクションで解決し、バージョンごとにマトリクスジョブとして実行します。
+
+```yaml
+- uses: morinoparty/fukurou/versions@v2
+  with:
+    minecraft-version: 26.2-
+```
+
+## シナリオの例
+
+`game-test/scenarios/hello.json` では、プレイヤーが `/pluginname` を実行し、クライアントのチャットログに `Hello from PluginName!` が表示されるまで待ってから、スクリーンショットを撮影します。
+
+```json
+{
+  "name": "/pluginname replies with a greeting",
+  "steps": [
+    { "on": "Alice", "action": "chat", "text": "/pluginname" },
+    { "on": "Alice", "action": "wait_for_log", "pattern": "\\[CHAT\\] Hello from PluginName!", "timeout": 10 },
+    { "on": "Alice", "action": "screenshot", "name": "hello" }
+  ]
+}
+```
+
+## 結果の確認
+
+スクリーンショット、サーバーとクライアントのログ、`result.json` は `fukurou-paper-<バージョン>` という名前のアーティファクトとしてアップロードされます。
+各テストの結果はジョブのサマリーにも表示されます。
+
+## ローカルでの検証
+
+シナリオの書式は、次のコマンドでサーバーを起動せずに検証できます。
+
+```bash
+uvx --from git+https://github.com/morinoparty/fukurou fukurou validate --suite game-test/fukurou.yml
+```

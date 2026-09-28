@@ -1,0 +1,59 @@
+name: In-game test
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # テスト対象の Minecraft バージョンを解決する
+  # paper-plugin.yml の apiVersion が 26.2 のため、26.2 以降を対象にする (27.x が出たら上限を指定して 26.x に絞る)
+  versions:
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.versions.outputs.matrix }}
+    steps:
+      - uses: morinoparty/fukurou/versions@d2834e454bd6541db83bb646465f3ef565b0675c # v2.2.1
+        id: versions
+        with:
+          minecraft-version: 26.2-
+
+  game-test:
+    name: Minecraft ${{ matrix.minecraft-version }}
+    needs: versions
+    runs-on: ubuntu-24.04
+    # 10 + N_reset x 1 分 (docs/usage.md の "Estimating timeout-minutes" を参照)
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        minecraft-version: ${{ fromJSON(needs.versions.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: 'temurin'
+          java-version: '25'
+
+      - uses: gradle/actions/setup-gradle@8379f6a1328ee0e06e2bb424dadb7b159856a326 # v4.4.0
+        with:
+          cache-read-only: true
+
+      - name: Build Paper plugin
+        run: |
+          chmod +x ./gradlew
+          ./gradlew :paper:shadowJar
+
+      # 実際の Paper サーバーとクライアントを起動し、game-test/ のシナリオを実行する
+      - uses: morinoparty/fukurou@d2834e454bd6541db83bb646465f3ef565b0675c # v2.2.1
+        with:
+          accept-eula: "true" # Minecraft EULA に同意する: https://aka.ms/MinecraftEULA
+          minecraft-version: ${{ matrix.minecraft-version }}
+          suite: game-test/fukurou.yml
+          plugins-dir: paper/build/libs
+          plugins: "*-all.jar"
