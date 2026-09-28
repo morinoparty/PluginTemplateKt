@@ -5,7 +5,7 @@ description: Spotless によるライセンスヘッダーの付与と検証
 
 # ライセンスヘッダー
 
-このテンプレートでは、Kotlin ソースおよび `*.gradle.kts` に CC0 のライセンスヘッダーを [Spotless](https://github.com/diffplug/spotless) で付与します。
+このテンプレートでは、Kotlin / Java ソースおよび `*.gradle.kts` に CC0 のライセンスヘッダーを [Spotless](https://github.com/diffplug/spotless) で付与します。
 
 ## ヘッダーの管理
 
@@ -29,6 +29,7 @@ task license:check    # = ./gradlew spotlessCheck
 | 種類 | 対象 |
 |------|------|
 | Kotlin ソース | `api/src/**/*.kt`, `common/src/**/*.kt`, `paper/src/**/*.kt`, `velocity/src/**/*.kt` |
+| Java ソース | `api/src/**/*.java`, `common/src/**/*.java`, `paper/src/**/*.java`, `velocity/src/**/*.java` |
 | Gradle スクリプト | ルートおよび各モジュールの `*.gradle.kts` |
 
 ## ビルドとの関係

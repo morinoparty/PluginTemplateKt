@@ -13,10 +13,8 @@ description: Gradle が生成するビルド時定数と Velocity の velocity-p
 | 定数 | 値の由来 | 主な用途 |
 |------|---------|---------|
 | `BuildConstants.VERSION` | `gradle.properties` の `version` | Velocity の `@Plugin(version = ...)` |
-| `BuildConstants.KOTLIN_VERSION` | `gradle/libs.versions.toml` の `kotlin` | Paper の `PluginLoader` が解決する `kotlin-stdlib` のバージョン |
 
 `const val` として生成されるため、アノテーション引数のようにコンパイル時定数が必要な場所でもそのまま利用できます。
-Paper の `PluginLoader` はプラグイン本体のクラスがロードされる前に実行されますが、`const val` はコンパイル時にインライン化されるので、`BuildConstants` クラスへの実行時参照は残りません。
 
 ```kotlin
 // Velocity: @Plugin の version を gradle.properties と連動させる
@@ -26,11 +24,6 @@ Paper の `PluginLoader` はプラグイン本体のクラスがロードされ�
     version = BuildConstants.VERSION,
 )
 class PluginName
-
-// Paper: ビルドに使った Kotlin と同じバージョンの stdlib を解決する
-resolver.addDependency(
-    Dependency(DefaultArtifact("org.jetbrains.kotlin:kotlin-stdlib:${BuildConstants.KOTLIN_VERSION}"), null),
-)
 ```
 
 ## パッケージ名を変更した場合

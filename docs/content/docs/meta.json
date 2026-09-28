@@ -1,7 +1,9 @@
 {
     "pages": [
+        "---[Rocket]はじめに---",
         "index",
-        "license-header",
-        "build-constants"
+        "...introduction",
+        "---[Hammer]開発---",
+        "...development"
     ]
 }

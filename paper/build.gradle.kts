@@ -25,6 +25,8 @@ dependencies {
     compileOnly(libs.paper.api)
 
     implementation(libs.bundles.commands.paper)
+    // cloud-kotlin-coroutines が推移的に持ち込む kotlin-reflect は古い版 (2.0.x) になるため、stdlib と同じ版にそろえる
+    implementation(libs.kotlin.reflect)
 
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.bundles.coroutines.bukkit)
@@ -40,11 +42,52 @@ dependencies {
     testImplementation(libs.mock.bukkit)
 }
 
+// JAR に同梱する依存。これ以外の runtimeClasspath の外部依存は PluginNameLoader が実行時に Paper に取得させる
+fun isBundled(
+    group: String,
+    version: String,
+): Boolean =
+    // common / api モジュール
+    group == "party.morino" ||
+        // スナップショット版 (cloud など) は Paper が参照する Maven Central のミラーにない
+        version.endsWith("-SNAPSHOT")
+
+// runtimeClasspath のうち同梱しない外部依存 (KMP は解決済みの -jvm アーティファクトになる)
+val runtimeLibraries =
+    configurations.runtimeClasspath.map { configuration ->
+        configuration.incoming.artifacts.artifacts
+            .mapNotNull { it.id.componentIdentifier as? ModuleComponentIdentifier }
+            .filterNot { isBundled(it.group, it.version) }
+            .map { "${it.group}:${it.module}:${it.version}" }
+            .distinct()
+    }
+
+// PluginNameLoader が読み込むライブラリ一覧をリソースとして生成する
+val generatePaperLibraries by tasks.registering {
+    val libraries = runtimeLibraries
+    val outputDirectory = layout.buildDirectory.dir("generated/paper-libraries")
+    // 依存が変わったときだけ再生成されるようにする
+    inputs.property("libraries", libraries)
+    outputs.dir(outputDirectory)
+    doLast {
+        outputDirectory.get().file("paper-libraries.txt").asFile.writeText(libraries.get().joinToString("\n"))
+    }
+}
+
+sourceSets.main {
+    resources.srcDir(generatePaperLibraries)
+}
+
 tasks {
     build {
         dependsOn("shadowJar")
     }
-    shadowJar
+    shadowJar {
+        // Paper が実行時に取得するので同梱しない
+        dependencies {
+            exclude { !isBundled(it.moduleGroup, it.moduleVersion) }
+        }
+    }
     test {
         useJUnitPlatform()
         testLogging {

@@ -17,6 +17,9 @@ plugins {
     // kapt は kotlin-gradle-plugin に同梱されているため、ルートでバージョンを解決してから各モジュールで alias できるようにする
     alias(libs.plugins.kotlin.kapt) apply false
     alias(libs.plugins.dokka)
+    // run-paper はルートでも解決しておく。paper モジュールだけで適用すると、ルートの dokka が持ち込む
+    // 古い kotlinx-serialization (1.6.0) が親のクラスローダーから使われ、runServer が AbstractMethodError で失敗するため
+    alias(libs.plugins.run.paper) apply false
     alias(libs.plugins.ktlint)
     alias(libs.plugins.spotless)
     id("dev.detekt") version "2.0.0-alpha.6"
@@ -125,6 +128,11 @@ spotless {
     val licenseHeader = rootProject.file("config/spotless/license-header.kt")
     kotlin {
         target("api/src/**/*.kt", "common/src/**/*.kt", "paper/src/**/*.kt", "velocity/src/**/*.kt")
+        licenseHeaderFile(licenseHeader).updateYearWithLatest(true)
+    }
+    // Paper の PluginLoader など、Kotlin 標準ライブラリより先に動く Java のクラス
+    java {
+        target("api/src/**/*.java", "common/src/**/*.java", "paper/src/**/*.java", "velocity/src/**/*.java")
         licenseHeaderFile(licenseHeader).updateYearWithLatest(true)
     }
     kotlinGradle {

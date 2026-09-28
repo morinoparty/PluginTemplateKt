@@ -152,16 +152,21 @@ task docs
 | 定数 | 値の由来 | 主な用途 |
 |------|---------|---------|
 | `BuildConstants.VERSION` | `gradle.properties` の `version` | Velocity の `@Plugin(version = ...)` |
-| `BuildConstants.KOTLIN_VERSION` | `gradle/libs.versions.toml` の `kotlin` | Paper の `PluginLoader` が解決する `kotlin-stdlib` のバージョン |
 
-いずれも `const val` なので `@Plugin` のようなアノテーション引数にそのまま使えます。
+`const val` なので `@Plugin` のようなアノテーション引数にそのまま使えます。
 Velocity モジュールでは kapt で `@Plugin` を処理して `velocity-plugin.json` を生成しているため、Kotlin ソースだけで Velocity プラグインとして認識されます。
+
+## 実行時ライブラリ
+
+Paper 向けの JAR には Kotlin 標準ライブラリや Koin などの依存を同梱せず、`PluginNameLoader` がサーバー起動時に Maven Central のミラーから取得します (JAR は約 9MB → 約 1MB)。
+取得するライブラリの一覧 (`paper-libraries.txt`) はビルド時に `runtimeClasspath` から自動生成されます。
+`party.morino` のモジュールと `-SNAPSHOT` 版 (cloud など) のみ JAR に同梱します。条件は `paper/build.gradle.kts` の `isBundled` で変更できます。
 
 ## GitHub Actions
 
 | ワークフロー | トリガー | 説明 |
 |-------------|---------|------|
-| `check_pull_request.yml` | Pull Request | ビルドチェック |
+| `check_pull_request.yml` | Pull Request | ビルドチェック・実行時ライブラリがミラーに存在するかの確認 |
 | `preview.yml` | Pull Request | プレビュービルド・S3 アップロード・PR コメント |
 | `upload.yml` | Release published | GitHub Release にJAR をアップロード |
 | `release.yml` | Push to master | Release Drafter でドラフトリリース作成 |
@@ -175,7 +180,7 @@ CC0-1.0
 
 ### ライセンスヘッダー
 
-Kotlin ソースと `*.gradle.kts` には [Spotless](https://github.com/diffplug/spotless) でライセンスヘッダーを付与します。
+Kotlin / Java ソースと `*.gradle.kts` には [Spotless](https://github.com/diffplug/spotless) でライセンスヘッダーを付与します。
 ヘッダー本文は `config/spotless/license-header.kt` に一元管理されており、`$YEAR` が年に置き換わります (既存ファイルは `開始年-現在年` に更新されます)。
 
 ```bash

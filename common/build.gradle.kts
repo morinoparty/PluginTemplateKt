@@ -21,22 +21,20 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 }
 
-// ビルド時の値 (プラグインのバージョン、Kotlin のバージョン) を Kotlin の const val として生成する。
-// @Plugin アノテーションの引数や PluginLoader で解決する kotlin-stdlib のバージョンは
-// コンパイル時定数である必要があるため、Gradle 側の値を BuildConstants.kt に書き出して参照させる。
+// ビルド時の値 (プラグインのバージョン) を Kotlin の const val として生成する。
+// Velocity の @Plugin アノテーションの引数はコンパイル時定数である必要があるため、
+// Gradle 側の値を BuildConstants.kt に書き出して参照させる。
 // パッケージ名を変更した場合はこの basePackage も合わせて変更すること。
 val basePackage = "party.morino.pluginname"
 val buildConstantsDir = layout.buildDirectory.dir("generated/sources/buildConstants/kotlin/main")
 
 val generateBuildConstants by tasks.registering {
     val pluginVersion = project.version.toString()
-    val kotlinVersion = libs.versions.kotlin.get()
     val packageDir = basePackage.replace('.', '/')
     val outputDir = buildConstantsDir
 
     // 入力値が変わったときだけ再生成されるようにする
     inputs.property("pluginVersion", pluginVersion)
-    inputs.property("kotlinVersion", kotlinVersion)
     inputs.property("basePackage", basePackage)
     outputs.dir(outputDir)
 
@@ -54,9 +52,6 @@ val generateBuildConstants by tasks.registering {
             |object BuildConstants {
             |    /** プラグインのバージョン (gradle.properties の version) */
             |    const val VERSION = "$pluginVersion"
-            |
-            |    /** ビルドに使用した Kotlin のバージョン (gradle/libs.versions.toml の kotlin) */
-            |    const val KOTLIN_VERSION = "$kotlinVersion"
             |}
             |
             """.trimMargin(),
