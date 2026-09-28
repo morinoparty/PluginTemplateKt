@@ -20,10 +20,12 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
+// ビルドキャッシュはデフォルトの保存先 (GRADLE_USER_HOME/caches/build-cache-1) を使う。
+// CI の gradle/actions/setup-gradle は GRADLE_USER_HOME しか保存しないため、
+// プロジェクト配下に置くとジョブ間でキャッシュが引き継がれず、毎回フルコンパイルになる
 buildCache {
     local {
         isEnabled = true
-        directory = file("$rootDir/.gradle/build-cache")
     }
 }
 include("common")
