@@ -30,7 +30,9 @@ val buildConstantsDir = layout.buildDirectory.dir("generated/sources/buildConsta
 
 val generateBuildConstants by tasks.registering {
     val pluginVersion = project.version.toString()
-    val packageDir = basePackage.replace('.', '/')
+    // configuration cache はスクリプトのプロパティを直列化できないため、doLast で使う値はローカル変数に移しておく
+    val packageName = basePackage
+    val packageDir = packageName.replace('.', '/')
     val outputDir = buildConstantsDir
 
     // 入力値が変わったときだけ再生成されるようにする
@@ -43,7 +45,7 @@ val generateBuildConstants by tasks.registering {
         file.parentFile.mkdirs()
         file.writeText(
             """
-            |package $basePackage.common
+            |package $packageName.common
             |
             |/**
             | * Gradle のビルド時に生成される定数

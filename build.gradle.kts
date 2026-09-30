@@ -14,8 +14,6 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 plugins {
     java
     alias(libs.plugins.kotlin.jvm)
-    // kapt は kotlin-gradle-plugin に同梱されているため、ルートでバージョンを解決してから各モジュールで alias できるようにする
-    alias(libs.plugins.kotlin.kapt) apply false
     alias(libs.plugins.dokka)
     // run-paper はルートでも解決しておく。paper モジュールだけで適用すると、ルートの dokka が持ち込む
     // 古い kotlinx-serialization (1.6.0) が親のクラスローダーから使われ、runServer が AbstractMethodError で失敗するため

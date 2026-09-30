@@ -11,8 +11,8 @@ plugins {
     java
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.serialization)
-    // Kotlin ソースの @Plugin を Velocity のアノテーションプロセッサで処理し velocity-plugin.json を生成する
-    alias(libs.plugins.kotlin.kapt)
+    // velocity-plugin.json を Gradle で生成する (kapt によるアノテーション処理より速い)
+    alias(libs.plugins.resource.factory)
     alias(libs.plugins.shadow)
 }
 
@@ -23,8 +23,6 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":api"))
     compileOnly(libs.velocity.api)
-    // annotationProcessor は Java ソースにしか効かないため、Kotlin では kapt を使う
-    kapt(libs.velocity.api)
 
     implementation(libs.bundles.commands.velocity)
 
@@ -66,6 +64,21 @@ tasks {
             showStandardStreams = true
             events("passed", "skipped", "failed")
             exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        }
+    }
+}
+
+sourceSets.main {
+    resourceFactory {
+        // @Plugin アノテーションの代わりに velocity-plugin.json を生成する
+        velocityPluginJson {
+            id = "pluginname"
+            name = rootProject.name
+            // gradle.properties の version と連動する
+            version = project.version.toString()
+            description = "A Minecraft plugin template"
+            authors.add("morinoparty")
+            main = "$group.pluginname.velocity.PluginName"
         }
     }
 }

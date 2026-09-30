@@ -14,7 +14,6 @@ import com.velocitypowered.api.command.CommandSource
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent
-import com.velocitypowered.api.plugin.Plugin
 import com.velocitypowered.api.proxy.ProxyServer
 import org.incendo.cloud.SenderMapper
 import org.incendo.cloud.execution.ExecutionCoordinator
@@ -23,18 +22,10 @@ import org.koin.core.context.GlobalContext
 import org.koin.core.context.GlobalContext.getOrNull
 import org.koin.dsl.module
 import org.slf4j.Logger
-import party.morino.pluginname.common.BuildConstants
 import party.morino.pluginname.common.PluginNameCommon
 import party.morino.pluginname.velocity.commands.ExampleCommand
 
-@Plugin(
-    id = "pluginname",
-    name = "PluginName",
-    // バージョンは Gradle が生成する BuildConstants から取得する (gradle.properties の version と連動)
-    version = BuildConstants.VERSION,
-    description = "A Minecraft plugin template",
-    authors = ["morinoparty"],
-)
+// プラグインのメタデータ (id / version など) は velocity/build.gradle.kts の velocityPluginJson で生成する
 class PluginName @Inject constructor(
     private val server: ProxyServer,
     private val logger: Logger,
