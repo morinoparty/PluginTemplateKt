@@ -3,6 +3,7 @@
     "pages": [
         "runtime-libraries",
         "build-constants",
-        "license-header"
+        "license-header",
+        "build-performance"
     ]
 }

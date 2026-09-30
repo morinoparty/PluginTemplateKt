@@ -34,6 +34,8 @@ jobs:
       # Gradle キャッシュの設定（setup-gradle を使用、より効率的）
       - uses: gradle/actions/setup-gradle@8379f6a1328ee0e06e2bb424dadb7b159856a326 # v4.4.0
         with:
+          # configuration cache を保存・復元するための暗号化キー (未設定なら configuration cache は保存されない)
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           # PR では読み取り専用にし、main へのプッシュでのみキャッシュを保存する
           cache-read-only: ${{ github.event_name == 'pull_request' }}
 
