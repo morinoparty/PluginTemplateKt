@@ -4,6 +4,7 @@
         "runtime-libraries",
         "build-constants",
         "license-header",
+        "game-test",
         "build-performance"
     ]
 }
