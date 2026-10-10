@@ -344,13 +344,9 @@ jobs:
 
           ### 📖 Documentation & Reports
           Available for 7 days (until $LIMIT_TIME)
-          | Resource | Link |
-          |----------|------|
-          | 📖 Documentation | [Preview]($DOCS_PREVIEW_URL) |
-          | 📖 Dokka API | [Preview]($DOKKA_URL) |
-          | 🧪 JUnit Report | [Report]($JUNIT_REPORT_URL) |
-          | 🎮 In-game Test | [Report]($GAME_TEST_REPORT_URL) |
-          | 🔍 Detekt Report | [Report]($DETEKT_REPORT_URL) |
+          | 📖 Documentation | 📖 Dokka API | 🧪 JUnit Report | 🔍 Detekt Report | 🦉 In-game Tests |
+          |:---:|:---:|:---:|:---:|:---:|
+          | [Preview]($DOCS_PREVIEW_URL) | [Preview]($DOKKA_URL) | [Report]($JUNIT_REPORT_URL) | [Report]($DETEKT_REPORT_URL) | [Viewer]($GAME_TEST_REPORT_URL) |
 
           ### 🧪 Test Summary
           | Tests | Passed | Skipped | Failed |
