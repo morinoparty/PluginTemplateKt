@@ -1,19 +1,22 @@
 ---
 title: Introduction
-description: PluginName Documentation
+description: PluginName のドキュメント
 ---
 
 # PluginName
 
-PluginName is a Minecraft plugin template.
+PluginName は、morinoparty の Minecraft プラグインテンプレート [PluginTemplateKt](https://github.com/morinoparty/PluginTemplateKt) から作成したプラグインです。
+Paper と Velocity の両方に対応したマルチモジュール構成になっています。
 
-## Features
+## 特徴
 
-- Multi-module structure (common, paper, velocity, api)
-- Paper and Velocity support
-- Cloud command framework
-- Koin dependency injection
+- マルチモジュール構成 (`common` / `paper` / `velocity` / `api`)
+- Paper と Velocity の両対応
+- [Cloud](https://github.com/Incendo/cloud) によるコマンド定義と [Koin](https://insert-koin.io/) による依存性注入
+- 依存ライブラリを JAR に同梱せず、Paper に実行時に取得させる軽量な JAR ([実行時ライブラリ](/docs/development/runtime-libraries))
+- [fukurou](https://github.com/morinoparty/fukurou) による、実際のサーバーとクライアントを使った in-game テスト ([In-game テスト](/docs/development/game-test))
+- プルリクエストごとのプレビュー (JAR、ドキュメント、テストレポート)
 
-## Getting Started
+## はじめに
 
-Documentation will be added here.
+テンプレートからプラグインを作成し、ビルドして動かすまでの手順は [Getting Started](/docs/introduction/getting-started) を参照してください。

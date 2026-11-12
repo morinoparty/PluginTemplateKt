@@ -22,8 +22,8 @@ dependencies {
 }
 
 // ビルド時の値 (プラグインのバージョン) を Kotlin の const val として生成する。
-// Velocity の @Plugin アノテーションの引数はコンパイル時定数である必要があるため、
-// Gradle 側の値を BuildConstants.kt に書き出して参照させる。
+// Gradle 側の値を BuildConstants.kt に書き出し、コードからコンパイル時定数として参照できるようにする。
+// (velocity-plugin.json は velocity/build.gradle.kts の velocityPluginJson で生成するため、ここでは扱わない)
 // パッケージ名を変更した場合はこの basePackage も合わせて変更すること。
 val basePackage = "party.morino.pluginname"
 val buildConstantsDir = layout.buildDirectory.dir("generated/sources/buildConstants/kotlin/main")

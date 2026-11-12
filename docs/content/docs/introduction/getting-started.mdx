@@ -12,7 +12,8 @@ description: テンプレートからプラグインを作成し、ビルドし�
 | ツール | バージョン | 用途 |
 |--------|-----------|------|
 | Java | 25 (Temurin 推奨) | Gradle ビルド |
-| Node.js / pnpm | 26+ / 10+ | ドキュメントのビルド |
+| Node.js | 26 (CI と同じ) | ドキュメントのビルド |
+| pnpm | 10.26.1 (`docs/package.json` の `packageManager`) | ドキュメントのビルド |
 | [Task](https://taskfile.dev/) | 任意 | タスクランナー |
 
 ## プロジェクト名の変更
@@ -25,13 +26,33 @@ GitHub の "Use this template" ボタンからリポジトリを作成したあ�
 - `common/build.gradle.kts` の `basePackage` (BuildConstants の生成先)
 - クラス名 `PluginName` / `PluginNameLoader` / `PluginNameBootstrap` など
 - `paper/build.gradle.kts` の `paperPluginYaml` (main / bootstrapper / loader のクラスパス、website)
+- `velocity/build.gradle.kts` の `velocityPluginJson` (id / main など)
+- ドキュメントサイトのサイト名と GitHub URL (`docs/src/lib/shared.ts` など。[ドキュメントサイト](/docs/development/docs-site) を参照)
+
+## AI エージェント向け指示ファイルの生成
+
+`CLAUDE.md` / `AGENTS.md` は `.agent/rules/` から生成するファイルで、git には含めていません。
+クローンした直後や `.agent/rules/` を編集したあとに、次のコマンドで生成してください。
+
+```bash
+bash .agent/build.sh
+
+# または Task を使用
+task agent
+```
+
+Orca で worktree を作成する場合は、この生成を Setup Script で自動化できます。[Orca のセットアップ](/docs/development/orca-setup) を参照してください。
 
 ## ビルド
 
 ```bash
+# ユニットテストも実行する
+./gradlew build
+
+# テストを省略する場合
 ./gradlew build -x test
 
-# または Task を使用
+# または Task を使用 (clean build、テストを含む)
 task build
 ```
 
@@ -46,5 +67,12 @@ Paper 向けの JAR は `paper/build/libs/*-all.jar`、Velocity 向けの JAR �
 task run
 ```
 
+開発サーバーの Minecraft のバージョンは `paper/build.gradle.kts` の `runServer` で指定しています (現在は 26.2)。
 初回起動時は、JAR に同梱していない依存ライブラリを Paper がダウンロードします。
 仕組みについては [実行時ライブラリ](/docs/development/runtime-libraries) を参照してください。
+
+## ドキュメントの編集
+
+ドキュメントは `docs/content/docs/` の MDX ファイルです。
+開発サーバーは `task docs` (または `cd docs && pnpm install && pnpm dev`) で起動できます。
+詳しくは [ドキュメントサイト](/docs/development/docs-site) を参照してください。
