@@ -137,7 +137,8 @@ jobs:
       - uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
         name: Install pnpm
         with:
-          version: 10
+          # docs/package.json の packageManager と同じ版を使う
+          package_json_file: docs/package.json
           run_install: false
 
       # pnpm キャッシュの設定
@@ -160,12 +161,12 @@ jobs:
 
       - name: Install docs dependencies
         working-directory: docs
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Generate Dokka API documentation
         run: ./gradlew dokkaGenerate
 
-      - name: Build Fumadocs
+      - name: Build docs (Fumadocs + TanStack Start)
         working-directory: docs
         env:
           BASE_PATH: /${{ env.PROJECT_NAME }}/${{ env.COMMIT_SHORT_SHA }}/docs

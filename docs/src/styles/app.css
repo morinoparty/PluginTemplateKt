@@ -1,0 +1,65 @@
+@import "tailwindcss";
+@import "fumadocs-ui/css/neutral.css";
+@import "fumadocs-ui/css/preset.css";
+
+/* fumadocs-ui の色を chlorophyll の mori パレットに合わせる (トークンは tokens.css で定義される) */
+/* mori の各段階は .dark でダークランプに切り替わるため、ライトとダークで同じ対応付けを使う */
+:root,
+.dark,
+.dark #nd-sidebar {
+    --color-fd-background: var(--mpc-colors-mori-bg);
+    --color-fd-muted: var(--mpc-colors-mori-surface-subtle);
+    --color-fd-secondary: var(--mpc-colors-mori-surface);
+    --color-fd-secondary-hover: var(--mpc-colors-mori-surface-hover);
+
+    --color-fd-foreground: var(--mpc-colors-mori-fg);
+    --color-fd-muted-foreground: var(--mpc-colors-mori-fg-muted);
+    --color-fd-secondary-foreground: var(--mpc-colors-mori-fg-subtle);
+
+    --color-fd-primary: var(--mpc-colors-mori-fg);
+    --color-fd-primary-foreground: var(--mpc-colors-mori-fg-subtle);
+
+    --color-fd-card: var(--mpc-colors-mori-bg-subtle);
+    --color-fd-card-foreground: var(--mpc-colors-mori-fg);
+
+    --color-fd-popover: var(--mpc-colors-mori-bg);
+    --color-fd-popover-foreground: var(--mpc-colors-mori-fg);
+
+    --color-fd-accent: var(--mpc-colors-mori-surface);
+    --color-fd-accent-foreground: var(--mpc-colors-mori-fg);
+
+    --color-fd-border: var(--mpc-colors-mori-border-subtle);
+    --color-fd-ring: var(--mpc-colors-mori-surface-hover);
+}
+
+html {
+    scrollbar-gutter: stable;
+}
+
+html > body[data-scroll-locked] {
+    margin-right: 0px !important;
+    --removed-body-scroll-bar-size: 0px !important;
+}
+
+/* 欧文は Satoshi、和文は源柔ゴシック */
+html,
+body {
+    font-family: "Satoshi", "GenJyuuGothicLP", system-ui, -apple-system, sans-serif;
+    font-weight: 500;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: "Satoshi", "GenJyuuGothicLP", system-ui, -apple-system, sans-serif;
+    font-weight: 700;
+}
+
+/* テキスト選択色 */
+::selection {
+    background-color: var(--mpc-colors-mori-5);
+    color: var(--mpc-colors-mori-12);
+}
