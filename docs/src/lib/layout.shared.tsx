@@ -8,6 +8,10 @@ export function baseOptions(): BaseLayoutProps {
             title: <span className="text-lg font-bold">{appName}</span>,
             url: "/docs",
         },
+        // ダークモードは提供しないため、テーマ切り替えを表示しない
+        themeSwitch: {
+            enabled: false,
+        },
         links: [
             {
                 type: "icon",

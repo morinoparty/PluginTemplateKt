@@ -40,7 +40,8 @@ function RootComponent() {
                 <HeadContent />
             </head>
             <body className="flex flex-col min-h-screen">
-                <RootProvider search={{ SearchDialog }}>
+                {/* ダークモードは提供しないため、テーマ (next-themes 相当) を無効にしてライト固定にする */}
+                <RootProvider search={{ SearchDialog }} theme={{ enabled: false }}>
                     <Outlet />
                 </RootProvider>
                 <Scripts />

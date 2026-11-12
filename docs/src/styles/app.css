@@ -3,10 +3,8 @@
 @import "fumadocs-ui/css/preset.css";
 
 /* fumadocs-ui の色を chlorophyll の mori パレットに合わせる (トークンは tokens.css で定義される) */
-/* mori の各段階は .dark でダークランプに切り替わるため、ライトとダークで同じ対応付けを使う */
-:root,
-.dark,
-.dark #nd-sidebar {
+/* ダークモードは提供しない (ライトテーマ固定) */
+:root {
     --color-fd-background: var(--mpc-colors-mori-bg);
     --color-fd-muted: var(--mpc-colors-mori-surface-subtle);
     --color-fd-secondary: var(--mpc-colors-mori-surface);

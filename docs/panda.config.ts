@@ -17,19 +17,6 @@ const preset: Preset = {
     },
 };
 
-// chlorophyll の 12 段階スケールはライトモード固定のため、.dark (fumadocs のダークモード) でダークランプに切り替える
-const steps = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-const lightDarkScale = (name: string) =>
-    Object.fromEntries(
-        steps.flatMap((step) => [
-            [step, { value: { base: `{colors.${name}.light.${step}}`, _dark: `{colors.${name}.dark.${step}}` } }],
-            [
-                `a${step}`,
-                { value: { base: `{colors.${name}.light.a${step}}`, _dark: `{colors.${name}.dark.a${step}}` } },
-            ],
-        ]),
-    );
-
 export default defineConfig({
     // リセット CSS は Tailwind (fumadocs-ui) 側のものを使う
     preflight: false,
@@ -38,15 +25,5 @@ export default defineConfig({
     // CSS 変数名を --mpc-colors-mori-* にする
     prefix: "mpc",
     presets: [preset],
-    theme: {
-        extend: {
-            semanticTokens: {
-                colors: {
-                    mori: lightDarkScale("mori"),
-                    gray: lightDarkScale("gray"),
-                },
-            },
-        },
-    },
     outdir: "styled-system",
 });
