@@ -61,3 +61,49 @@ h6 {
     background-color: var(--mpc-colors-mori-5);
     color: var(--mpc-colors-mori-12);
 }
+
+/* ---- サイドバーとモバイルのヘッダーのボタンを MineAuth のドキュメント (mineauth.plugin.morino.party) にそろえる ---- */
+/* fumadocs-ui の DocsLayout をそのまま使い、見た目の差分だけを上書きする (fumadocs-ui のバージョンは固定している) */
+
+/* アイコンボタン (サイドバーの折りたたみ・開閉、検索、Modrinth / GitHub) は 32px 四方にする */
+:is(#nd-sidebar, #nd-sidebar-mobile, #nd-subnav, [data-sidebar-panel])
+    :is(a, button)[aria-label]:not([data-radix-scroll-area-viewport] *) {
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+}
+
+/* ボタンのアイコンは 16px、外部リンク (Modrinth / GitHub) のアイコンだけ 18px */
+:is(#nd-sidebar, #nd-sidebar-mobile, #nd-subnav, [data-sidebar-panel])
+    button[aria-label]:not([data-radix-scroll-area-viewport] *)
+    svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+:is(#nd-sidebar, #nd-sidebar-mobile) a[aria-label]:not([data-radix-scroll-area-viewport] *) svg {
+    width: 1.125rem;
+    height: 1.125rem;
+}
+
+/* デスクトップのサイドバー下部: アイコンリンクを枠で囲まず、区切り線の下に並べる */
+#nd-sidebar > div:has(> div > a[aria-label]) {
+    border-top: 1px solid var(--color-fd-border);
+}
+
+#nd-sidebar > div > div:has(> a[aria-label]) {
+    gap: 0.25rem;
+    padding: 0;
+    border: 0;
+    background-color: transparent;
+}
+
+/* 選択中のページは Chlorophyll の solid 色で塗りつぶす */
+:is(#nd-sidebar, #nd-sidebar-mobile) [data-radix-scroll-area-viewport] a[data-active="true"] {
+    background-color: var(--mpc-colors-mori-solid);
+    color: var(--mpc-colors-mori-contrast);
+}
+
+:is(#nd-sidebar, #nd-sidebar-mobile) [data-radix-scroll-area-viewport] a[data-active="true"]:hover {
+    background-color: var(--mpc-colors-mori-solid-emphasized);
+}

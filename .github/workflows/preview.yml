@@ -270,7 +270,7 @@ jobs:
             --transfers=32 --checkers=32 --stats=5s --stats-one-line -v
 
           # 公開ドメインはディレクトリの URL から index.html を自動で解決しない。
-          # docs のリンクは末尾スラッシュ (/docs/development/game-test/) なので、各 index.html を
+          # docs のリンクは末尾スラッシュ (<PREFIX>/docs/development/game-test/) なので、各 index.html を
           # 末尾スラッシュのキーとしても置き、リンク先や直接開いた URL が 404 にならないようにする
           find ./upload/docs -name index.html -print0 \
             | xargs -0 -P 16 -I {} sh -c '

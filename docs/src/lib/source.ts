@@ -28,7 +28,7 @@ export const source = loader({
     },
 });
 
-// page.url は baseUrl (/docs) から始まり、Vite の base (BASE_PATH) を含まない
+// page.url は baseUrl (/) から始まり、Vite の base (BASE_PATH) を含まない
 // llms.txt はルーターを通らないため、配置先のサブパスと末尾スラッシュをここで付ける
 function toPublicUrl(url: string) {
     return `${import.meta.env.BASE_URL.replace(/\/+$/, "")}${url.replace(/\/+$/, "")}/`;

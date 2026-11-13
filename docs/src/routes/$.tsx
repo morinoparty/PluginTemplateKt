@@ -8,9 +8,11 @@ import { baseOptions } from "@/lib/layout.shared";
 import { appName } from "@/lib/shared";
 import { docs, source } from "@/lib/source";
 
+// ドキュメントはサイトのルート (BASE_PATH 直下) に置く。トップページは空の splat (index.mdx) になる
+// /api/search.json・/llms.txt・/404 などの個別のルートは、TanStack Router のルートの順位付けによりこの splat より優先される
 // 静的サイトとして配信するため、サーバー関数は使わない
 // fumadocs-mdx/macro のコレクションはブラウザでも読めるので、ローダーはサーバー (プリレンダー) とクライアントの両方で動く
-export const Route = createFileRoute("/docs/$")({
+export const Route = createFileRoute("/$")({
     component: Page,
     loader: async ({ params }) => {
         const slugs = params._splat?.split("/").filter((v) => v.length > 0) ?? [];

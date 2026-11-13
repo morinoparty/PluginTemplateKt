@@ -3,7 +3,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import react from "@vitejs/plugin-react";
 import { fumadocsMdx } from "fumadocs-mdx/vite";
-import { defineConfig, lazyPlugins } from "vite-plus";
+import { defineConfig, lazyPlugins, type Plugin } from "vite-plus";
 
 // プレビュー環境では /PluginName/<sha>/docs のようなサブパスに配置される (CI が BASE_PATH を渡す)
 // Vite の base から TanStack Router の basepath も導出される
@@ -20,6 +20,25 @@ const ignorePatterns = [
     "**/styled-system/**",
     "**/routeTree.gen.ts",
 ];
+
+// 開発サーバーでも public/dokka のディレクトリの URL (dokka/ など) で index.html を返す
+// Vite は public/ のディレクトリを index.html に解決しないため、そのままだとドキュメントの splat ルートが 404 を返してしまう
+function dokkaDirectoryIndex(): Plugin {
+    return {
+        name: "dokka-directory-index",
+        apply: "serve",
+        configureServer(server) {
+            server.middlewares.use((req, _res, next) => {
+                const url = new URL(req.url ?? "/", "http://localhost");
+                const dokkaPrefix = `${basePath}/dokka/`;
+                if (url.pathname.startsWith(dokkaPrefix) && url.pathname.endsWith("/")) {
+                    req.url = `${url.pathname}index.html${url.search}`;
+                }
+                next();
+            });
+        },
+    };
+}
 
 export default defineConfig({
     base: `${basePath}/`,
@@ -83,6 +102,7 @@ export default defineConfig({
     },
     // lint / fmt など設定値だけを読むコマンドではプラグインを初期化しない
     plugins: lazyPlugins(() => [
+        dokkaDirectoryIndex(),
         fumadocsMdx(),
         tailwindcss(),
         tanstackStart({
@@ -90,14 +110,19 @@ export default defineConfig({
                 enabled: true,
                 // サイドバーなどのリンクをたどってすべてのページを書き出す
                 crawlLinks: true,
-                // トップページは public/index.html (相対パスで docs/ へ転送する静的ページ) を使う
-                // PR コメントは .../docs/index.html を開くため、アプリのルートとしてハイドレーションさせない
-                // クロールで見つかるパスには base が付く (404 ページのホームへのリンクなど) ため、base 付きのトップも除外する
-                filter: (page) => page.path !== "/" && page.path !== `${basePath}/`,
+                // public/ からそのままコピーされる Dokka の出力は、アプリのページとして書き出さない
+                // (ドキュメントの splat ルートで描画すると、コピーされた dokka/**/index.html を 404 ページで上書きしてしまう)
+                // クロールで見つかるパスには base が付く場合があるため、base を外してから判定する
+                filter: (page) => {
+                    const path =
+                        basePath && page.path.startsWith(`${basePath}/`) ? page.path.slice(basePath.length) : page.path;
+                    return !/^\/dokka(\/|$)/.test(path);
+                },
             },
             // リンクからたどれないルートは明示する
             pages: [
-                { path: "/docs" },
+                // ドキュメントのトップ (サイトのルート)
+                { path: "/" },
                 { path: "/api/search.json" },
                 { path: "/llms.txt" },
                 { path: "/llms-full.txt" },

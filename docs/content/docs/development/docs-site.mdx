@@ -13,7 +13,7 @@ description: Fumadocs + TanStack Start + Vite+ で構成したドキュメント
 
 | コマンド | 内容 |
 |---------|------|
-| `pnpm dev` | 開発サーバーを起動する (`vp dev`、`http://localhost:3000/docs/`) |
+| `pnpm dev` | 開発サーバーを起動する (`vp dev`、`http://localhost:3000/`) |
 | `pnpm build` | 静的サイトを `docs/out` に出力する (`vp build`) |
 | `pnpm preview` | ビルドしたサイトを確認する (`vp preview`) |
 | `pnpm check` | フォーマットとリントを行い、修正できるものは修正する (`vp check --fix`) |
@@ -38,7 +38,7 @@ CI (`check_pull_request.yml` の `docs` ジョブ) でも `pnpm check:ci` と `p
 | `pnpm-workspace.yaml` | Vite+ のバージョン (catalog) と pnpm の設定 |
 | `panda.config.ts` | Chlorophyll のプリセットからデザイントークンを生成する Panda CSS の設定 |
 | `source.config.ts` | すべての MDX に共通する remark プラグインの設定 |
-| `public/` | そのまま出力される静的ファイル (トップページの転送用 `index.html`、Dokka の出力先 `dokka/`) |
+| `public/` | そのまま出力される静的ファイル (Dokka の出力先 `dokka/`。git には含めない) |
 
 `src/routeTree.gen.ts` はルートから自動生成されるファイルです。手で編集しないでください。
 
@@ -67,6 +67,7 @@ const icons = { Hammer, Rocket };
 色のデザイントークンは、morinoparty のデザインシステム [Chlorophyll](https://github.com/morinoparty/Chlorophyll) (`@morinoparty/chlorophyll-react`) のものを使っています。
 `panda.config.ts` で Chlorophyll の Panda CSS プリセットからトークンだけを取り出し、CSS 変数 (`--mpc-colors-mori-*` など) として出力しています。
 コンポーネントは fumadocs-ui のものを使い、色をこれらの CSS 変数で上書きしています。ダークモードは提供せず、ライトテーマ固定です。
+サイドバーやヘッダーのボタンの大きさ・配置、選択中のページの色は、[MineAuth のドキュメント](https://mineauth.plugin.morino.party/docs/) にそろえて `src/styles/app.css` で上書きしています。
 
 ## 公開先と BASE_PATH
 
@@ -74,6 +75,9 @@ const icons = { Hammer, Rocket };
 |--------|-------------|-------------|
 | GitHub Pages | `deploy_docs.yml` (main への push で `docs/` が変更されたとき) | Pages の公開パス (`actions/configure-pages` の `base_path`。カスタムドメインならルート、`https://<owner>.github.io/<repo>/` なら `/<repo>`) |
 | プレビュー (S3) | `preview.yml` (プルリクエスト) | `/PluginName/<コミット SHA>/docs` |
+
+ドキュメントはサイトのルート (`BASE_PATH` 直下) に配置されます。トップページ (`<BASE_PATH>/`) が `content/docs/index.mdx` で、`content/docs/introduction/getting-started.mdx` は `<BASE_PATH>/introduction/getting-started/` になります。
+MDX から別のページへリンクするときは、`[Getting Started](/introduction/getting-started)` のように `BASE_PATH` を含まないパスで書きます (`BASE_PATH` はルーターが付けます)。
 
 サブパスに配置する場合は、ビルド時に環境変数 `BASE_PATH` を指定します。リンクやアセットの URL、検索インデックスの URL にこのパスが付きます。
 
@@ -85,8 +89,8 @@ BASE_PATH=/PluginName/abc1234/docs pnpm build
 
 | パス | 内容 |
 |------|------|
-| `index.html` | `docs/` へ転送するページ (`public/index.html`) |
-| `docs/**/index.html` | 各ドキュメントページ |
+| `index.html` | ドキュメントのトップページ (`content/docs/index.mdx`) |
+| `**/index.html` | 各ドキュメントページ (例: `introduction/getting-started/index.html`) |
 | `api/search.json` | 検索インデックス (検索はブラウザ内で行う) |
 | `llms.txt` / `llms-full.txt` | LLM 向けのページ一覧と全文 |
 | `404.html` | 存在しない URL で GitHub Pages が返すページ (`src/routes/404.tsx`) |

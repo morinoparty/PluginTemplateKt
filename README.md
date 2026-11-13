@@ -79,7 +79,6 @@ GitHub の "Use this template" ボタンからリポジトリを作成するか�
 #    - .agent/rules/: プロジェクト名、リポジトリ URL (CLAUDE.md / AGENTS.md は task agent で生成)
 #    - docs/src/lib/shared.ts: サイト名、GitHub リポジトリ、Modrinth URL
 #    - docs/src/routes/__root.tsx: <title> と description
-#    - docs/public/index.html: トップページの <title>
 #    - docs/content/docs/meta.json: title (llms.txt の見出し)
 #    - .github/workflows/preview.yml: PROJECT_NAME
 #    - .github/workflows/upload.yml: JAR ファイル名
@@ -134,7 +133,7 @@ task run
 ```bash
 cd docs
 pnpm install
-pnpm dev          # 開発サーバー (http://localhost:3000/docs/)
+pnpm dev          # 開発サーバー (http://localhost:3000/)
 
 pnpm check        # フォーマット・リント (vp check --fix)
 pnpm check:ci     # フォーマット・リントの検証のみ (vp check)
@@ -146,6 +145,7 @@ task docs         # pnpm install + pnpm dev
 task docs:build   # pnpm install + pnpm build
 ```
 
+ドキュメントはサイトのルート (`BASE_PATH` 直下) に配置され、トップページがそのままドキュメントの最初のページになります。
 サブパスに配置する場合は `BASE_PATH` を指定してビルドします (例: `BASE_PATH=/PluginName/abc1234/docs pnpm build`)。
 Dokka の API ドキュメントは `./gradlew dokkaGenerate` で `docs/public/dokka` に出力され、ビルド時に `docs/out/dokka` にコピーされます。
 
@@ -164,7 +164,6 @@ Dokka の API ドキュメントは `./gradlew dokkaGenerate` で `docs/public/d
 - [ ] `.agent/rules/` のプロジェクト説明とリポジトリ URL を変更し、`task agent` で `CLAUDE.md` / `AGENTS.md` を生成
 - [ ] `docs/src/lib/shared.ts` のサイト名 (`appName`)、GitHub リポジトリ (`gitConfig`)、`modrinthUrl` を変更
 - [ ] `docs/src/routes/__root.tsx` の `title` / `description` を変更
-- [ ] `docs/public/index.html` の `<title>` を変更
 - [ ] `docs/content/docs/meta.json` の `title` と `docs/content/docs/` の本文を変更
 - [ ] `docs/package.json` の `name` を変更
 - [ ] `.github/workflows/preview.yml` の `PROJECT_NAME` を変更
