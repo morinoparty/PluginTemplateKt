@@ -172,9 +172,8 @@ Dokka の API ドキュメントは `./gradlew dokkaGenerate` で `docs/public/d
 - [ ] `game-test/scenarios/hello.json` をプラグインのコマンドに合わせて変更
 - [ ] GitHub リポジトリの Settings で GitHub Pages を有効化 (Source は GitHub Actions。公開パスは `deploy_docs.yml` が Pages の設定から取得するため、カスタムドメインの有無で設定を変える必要はない)
 - [ ] GitHub リポジトリの Secrets に S3 認証情報を設定 (プレビュー機能を使う場合)
-- [ ] CI が使う Organization Secrets (すべて `MORINOPARTY_CI_` から始まる) をリポジトリから参照できるようにする
-  - プレビュー (`preview.yml`): `MORINOPARTY_CI_AWS_ACCESS_KEY_ID`、`MORINOPARTY_CI_AWS_SECRET_ACCESS_KEY`、`MORINOPARTY_CI_AWS_REGION`、`MORINOPARTY_CI_S3_ENDPOINT`、`MORINOPARTY_CI_S3_UPLOAD_BUCKET`、`MORINOPARTY_CI_S3_PUBLIC_URL` (PR コメントに載せる公開 URL のベース)
-  - Gradle の configuration cache (任意): `MORINOPARTY_CI_GRADLE_ENCRYPTION_KEY`
+- [ ] プレビュー (`preview.yml`) が使う S3 の Organization Secrets (`MORINOPARTY_CI_` から始まる) をリポジトリから参照できるようにする: `MORINOPARTY_CI_AWS_ACCESS_KEY_ID`、`MORINOPARTY_CI_AWS_SECRET_ACCESS_KEY`、`MORINOPARTY_CI_AWS_REGION`、`MORINOPARTY_CI_S3_ENDPOINT`、`MORINOPARTY_CI_S3_UPLOAD_BUCKET`、`MORINOPARTY_CI_S3_PUBLIC_URL` (PR コメントに載せる公開 URL のベース)
+- [ ] GitHub リポジトリの Secrets に `GRADLE_ENCRYPTION_KEY` を設定 (CI で configuration cache を使う場合、任意)
 - [ ] 不要な初期サンプルコード (`ExampleCommand`) を削除
 - [ ] `config/spotless/license-header.kt` の著者名を変更し、`task license` でヘッダーを付け直す
 - [ ] Orca を使う場合は、リポジトリ設定の Setup Script を設定 (ドキュメントの「Orca のセットアップ」を参照)
