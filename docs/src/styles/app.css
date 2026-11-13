@@ -2,32 +2,34 @@
 @import "fumadocs-ui/css/neutral.css";
 @import "fumadocs-ui/css/preset.css";
 
-/* fumadocs-ui の色を chlorophyll の mori パレットに合わせる (トークンは tokens.css で定義される) */
+/* fumadocs-ui の色を chlorophyll の colorPalette (既定は mori) に合わせる (トークンは tokens.css で定義される) */
+/* 本文色は chlorophyll の colorPalette.fg (step12 にパレットの色味 step11 を混ぜた色) を使う */
+/* 背景・補足テキスト・枠線などは MineAuth のドキュメント (mineauth.plugin.morino.party) と同じ見た目になるよう、パレットの段階を直接参照する */
+/* --color-fd-muted と --color-fd-border は MineAuth と同じく fumadocs-ui の既定値 (neutral.css) のままにする */
 /* ダークモードは提供しない (ライトテーマ固定) */
 :root {
-    --color-fd-background: var(--mpc-colors-mori-bg);
-    --color-fd-muted: var(--mpc-colors-mori-surface-subtle);
-    --color-fd-secondary: var(--mpc-colors-mori-surface);
-    --color-fd-secondary-hover: var(--mpc-colors-mori-surface-hover);
+    --color-fd-background: var(--mpc-colors-color-palette-2);
+    --color-fd-secondary: var(--mpc-colors-color-palette-3);
+    --color-fd-secondary-hover: var(--mpc-colors-color-palette-4);
 
-    --color-fd-foreground: var(--mpc-colors-mori-fg);
-    --color-fd-muted-foreground: var(--mpc-colors-mori-fg-muted);
-    --color-fd-secondary-foreground: var(--mpc-colors-mori-fg-subtle);
+    --color-fd-foreground: var(--mpc-colors-color-palette-fg);
+    /* chlorophyll に同じ値のトークンがないため、MineAuth の補足テキストの値をそのまま使う */
+    --color-fd-muted-foreground: #49454f;
+    --color-fd-secondary-foreground: var(--mpc-colors-color-palette-11);
 
-    --color-fd-primary: var(--mpc-colors-mori-fg);
-    --color-fd-primary-foreground: var(--mpc-colors-mori-fg-subtle);
+    --color-fd-primary: var(--mpc-colors-color-palette-fg);
+    --color-fd-primary-foreground: var(--mpc-colors-color-palette-11);
 
-    --color-fd-card: var(--mpc-colors-mori-bg-subtle);
-    --color-fd-card-foreground: var(--mpc-colors-mori-fg);
+    --color-fd-card: var(--mpc-colors-color-palette-1);
+    --color-fd-card-foreground: var(--mpc-colors-color-palette-fg);
 
-    --color-fd-popover: var(--mpc-colors-mori-bg);
-    --color-fd-popover-foreground: var(--mpc-colors-mori-fg);
+    --color-fd-popover: var(--mpc-colors-color-palette-2);
+    --color-fd-popover-foreground: var(--mpc-colors-color-palette-fg);
 
-    --color-fd-accent: var(--mpc-colors-mori-surface);
-    --color-fd-accent-foreground: var(--mpc-colors-mori-fg);
+    --color-fd-accent: var(--mpc-colors-color-palette-3);
+    --color-fd-accent-foreground: var(--mpc-colors-color-palette-fg);
 
-    --color-fd-border: var(--mpc-colors-mori-border-subtle);
-    --color-fd-ring: var(--mpc-colors-mori-surface-hover);
+    --color-fd-ring: var(--mpc-colors-color-palette-4);
 }
 
 html {
@@ -58,8 +60,8 @@ h6 {
 
 /* テキスト選択色 */
 ::selection {
-    background-color: var(--mpc-colors-mori-5);
-    color: var(--mpc-colors-mori-12);
+    background-color: var(--mpc-colors-color-palette-5);
+    color: var(--mpc-colors-color-palette-12);
 }
 
 /* ---- サイドバーとモバイルのヘッダーのボタンを MineAuth のドキュメント (mineauth.plugin.morino.party) にそろえる ---- */
@@ -98,12 +100,22 @@ h6 {
     background-color: transparent;
 }
 
+/* ホバー時の背景は MineAuth と同じく accent の 90% にする (fumadocs-ui 16.19 の既定は 50%) */
+:is(#nd-sidebar, #nd-sidebar-mobile) [data-radix-scroll-area-viewport] :is(a, button):not([data-active="true"]):hover {
+    background-color: color-mix(in oklab, var(--color-fd-accent) 90%, transparent);
+}
+
 /* 選択中のページは Chlorophyll の solid 色で塗りつぶす */
 :is(#nd-sidebar, #nd-sidebar-mobile) [data-radix-scroll-area-viewport] a[data-active="true"] {
-    background-color: var(--mpc-colors-mori-solid);
-    color: var(--mpc-colors-mori-contrast);
+    background-color: var(--mpc-colors-color-palette-solid);
+    color: var(--mpc-colors-color-palette-contrast);
 }
 
 :is(#nd-sidebar, #nd-sidebar-mobile) [data-radix-scroll-area-viewport] a[data-active="true"]:hover {
-    background-color: var(--mpc-colors-mori-solid-emphasized);
+    background-color: var(--mpc-colors-color-palette-solid-emphasized);
+}
+
+/* コードブロックに MineAuth と同じ影を付ける (fumadocs-ui 16.19 では shadow-sm が外れている) */
+#nd-page figure.shiki {
+    @apply shadow-sm;
 }

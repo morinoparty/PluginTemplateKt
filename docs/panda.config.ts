@@ -1,5 +1,5 @@
 import { createPreset, stone } from "@morinoparty/chlorophyll-react/preset";
-import { defineConfig } from "@pandacss/dev";
+import { defineConfig, defineGlobalStyles } from "@pandacss/dev";
 import type { Preset } from "@pandacss/types";
 
 // chlorophyll のプリセットからデザイントークン (CSS 変数) だけを使う
@@ -17,6 +17,16 @@ const preset: Preset = {
     },
 };
 
+// colorPalette.* (--mpc-colors-color-palette-*) を mori に向ける。data-color-palette で切り替えられるようにする (MoriPath と同じ)
+const globalCss = defineGlobalStyles({
+    ":root": {
+        colorPalette: "mori",
+    },
+    ':root[data-color-palette="umi"]': {
+        colorPalette: "umi",
+    },
+});
+
 export default defineConfig({
     // リセット CSS は Tailwind (fumadocs-ui) 側のものを使う
     preflight: false,
@@ -25,5 +35,6 @@ export default defineConfig({
     // CSS 変数名を --mpc-colors-mori-* にする
     prefix: "mpc",
     presets: [preset],
+    globalCss,
     outdir: "styled-system",
 });
