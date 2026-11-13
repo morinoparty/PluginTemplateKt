@@ -250,9 +250,25 @@ jobs:
           RCLONE_CONFIG_S3_ENDPOINT: ${{ env.S3_ENDPOINT }}
           RCLONE_CONFIG_S3_NO_CHECK_BUCKET: "true"
         run: |
-          command -v rclone >/dev/null || { sudo apt-get update && sudo apt-get install -y rclone; }
+          # secret が空のまま進むと、誤ったキーにアップロードしたり PR コメントの URL が壊れたりするため止める
+          for name in AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_REGION S3_ENDPOINT S3_UPLOAD_BUCKET S3_PUBLIC_URL; do
+            if [ -z "${!name}" ]; then
+              echo "::error::$name is empty (check the MORINOPARTY_CI_* organization secrets)"
+              exit 1
+            fi
+          done
 
-          PREFIX="${PROJECT_NAME}/${COMMIT_SHORT_SHA}"
+          # apt の rclone (1.60) は R2 への転送で NotImplemented が多発するため、検証済みの公式リリースを使う
+          RCLONE_VERSION=v1.76.0
+          RCLONE_SHA256=b00f00b3266c3764413afe599d3ec316f6f43b3e0ea8a0bc1d186d2133e46df7
+          curl -fsSL -o rclone.zip "https://downloads.rclone.org/${RCLONE_VERSION}/rclone-${RCLONE_VERSION}-linux-amd64.zip"
+          echo "${RCLONE_SHA256}  rclone.zip" | sha256sum -c -
+          unzip -q -j rclone.zip "rclone-${RCLONE_VERSION}-linux-amd64/rclone" -d "$RUNNER_TEMP/rclone"
+          export PATH="$RUNNER_TEMP/rclone:$PATH"
+          rclone version
+
+          # xargs から起動する sh でも参照できるよう export する
+          export PREFIX="${PROJECT_NAME}/${COMMIT_SHORT_SHA}"
 
           # JAR・Docs・レポートをまとめて 1 プロセスで送る
           rclone copy ./upload "s3:${S3_UPLOAD_BUCKET}/${PREFIX}" \
