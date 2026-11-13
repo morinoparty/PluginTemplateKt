@@ -212,7 +212,7 @@ Paper 向けの JAR には Kotlin 標準ライブラリや Koin などの依存�
 
 | ワークフロー | トリガー | 説明 |
 |-------------|---------|------|
-| `check_pull_request.yml` | Pull Request / Push to main | ビルドチェック・実行時ライブラリがミラーに存在するかの確認 |
+| `check_pull_request.yml` | Pull Request / Push to main | ビルドチェック・実行時ライブラリがミラーに存在するかの確認・docs の lint / 整形 / 型チェック (`pnpm check:ci` / `pnpm typecheck`) |
 | `preview.yml` | Pull Request | プレビュービルド・fukurou の in-game テスト・S3 アップロード・PR コメント |
 | `upload.yml` | Release published | GitHub Release に JAR をアップロード |
 | `release.yml` | Push to main | Release Drafter でドラフトリリース作成 |

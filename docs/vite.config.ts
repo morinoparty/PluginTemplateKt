@@ -28,7 +28,30 @@ export default defineConfig({
         printWidth: 120,
         // package.json のキー順は手で管理する
         sortPackageJson: false,
-        sortImports: {},
+        // Chlorophyll (morinoparty/Chlorophyll) と同じ並び (プロトコル付き → パッケージ → エイリアス → 絶対パス → 遠い相対パス順)
+        sortImports: {
+            newlinesBetween: false,
+            // 既存の空行による区切りを保ち、それをまたいで並べ替えない
+            partitionByNewline: true,
+            // コメントを境に並べ替えを区切る。順序に意味のある副作用 import (CSS など) の直前にはコメントを置く
+            partitionByComment: true,
+            customGroups: [
+                // node:fs や fumadocs-mdx:collections/browser のようなプロトコル付きの指定子
+                { groupName: "protocol", elementNamePattern: ["*:*", "*:*/**"] },
+                { groupName: "absolute", elementNamePattern: ["/**"] },
+                { groupName: "parent-2", elementNamePattern: ["../../**"] },
+            ],
+            groups: [
+                ["builtin", "protocol"],
+                "external",
+                ["internal", "subpath"],
+                "absolute",
+                "parent-2",
+                "parent",
+                ["sibling", "index"],
+                "unknown",
+            ],
+        },
         // content/ (ドキュメント本文と meta.json) は整形しない
         ignorePatterns: [...ignorePatterns, "content/**", "**/*.md", "**/*.mdx", "**/*.yml", "**/*.yaml"],
     },

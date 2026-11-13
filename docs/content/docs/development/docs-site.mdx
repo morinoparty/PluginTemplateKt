@@ -23,6 +23,8 @@ description: Fumadocs + TanStack Start + Vite+ で構成したドキュメント
 リポジトリ直下からは `task docs` (`pnpm install` + `pnpm dev`) と `task docs:build` (`pnpm install` + `pnpm build`) でも実行できます。
 `docs/` を変更した場合は、`pnpm check:ci`、`pnpm typecheck`、`pnpm build` が通ることを確認してください。
 
+CI (`check_pull_request.yml` の `docs` ジョブ) でも `pnpm check:ci` と `pnpm typecheck` を実行します。GitHub Actions では [`voidzero-dev/setup-vp`](https://github.com/voidzero-dev/setup-vp) で Vite+・Node (`docs/.node-version`)・pnpm (`docs/package.json` の `packageManager`) をまとめて準備し、依存を `--frozen-lockfile` で install します。
+
 ## 構成
 
 | パス | 役割 |
