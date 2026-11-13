@@ -238,25 +238,40 @@ jobs:
           mv ./artifacts/docs-artifacts/* ./upload/docs/
           cp -r ./artifacts/fukurou-site ./upload/fukurou || echo "No in-game test report"
 
-      - name: Upload to S3 (parallel)
+      # aws s3 cp はファイルごとの処理が遅く、--only-show-errors では進捗も出ないため rclone で送る。
+      # rclone は単一プロセスで接続を再利用しながら高い並列数で転送し、5 秒ごとに進捗をログに出す
+      - name: Upload to S3
+        env:
+          RCLONE_CONFIG_S3_TYPE: s3
+          RCLONE_CONFIG_S3_PROVIDER: Cloudflare
+          RCLONE_CONFIG_S3_ACCESS_KEY_ID: ${{ env.AWS_ACCESS_KEY_ID }}
+          RCLONE_CONFIG_S3_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          RCLONE_CONFIG_S3_REGION: ${{ env.AWS_REGION }}
+          RCLONE_CONFIG_S3_ENDPOINT: ${{ env.S3_ENDPOINT }}
+          RCLONE_CONFIG_S3_NO_CHECK_BUCKET: "true"
         run: |
-          # AWS CLIの並列リクエスト数を増やす
-          aws configure set default.s3.max_concurrent_requests 50
+          command -v rclone >/dev/null || { sudo apt-get update && sudo apt-get install -y rclone; }
 
-          S3_BASE="s3://${{ env.S3_UPLOAD_BUCKET }}/${{ env.PROJECT_NAME }}/${{ env.COMMIT_SHORT_SHA }}"
-          S3_OPTS="--endpoint-url ${S3_ENDPOINT} --only-show-errors"
+          PREFIX="${PROJECT_NAME}/${COMMIT_SHORT_SHA}"
 
-          # JAR と Docs と レポートを並列でアップロード
-          aws s3 cp ./upload/jars $S3_BASE/jars $S3_OPTS --recursive &
-          aws s3 cp ./upload/junit $S3_BASE/junit $S3_OPTS --recursive &
-          aws s3 cp ./upload/detekt $S3_BASE/detekt $S3_OPTS --recursive &
-          aws s3 cp ./upload/docs $S3_BASE/docs $S3_OPTS --recursive &
-          if [ -d ./upload/fukurou ]; then
-            aws s3 cp ./upload/fukurou $S3_BASE/fukurou $S3_OPTS --recursive &
-          fi
+          # JAR・Docs・レポートをまとめて 1 プロセスで送る
+          rclone copy ./upload "s3:${S3_UPLOAD_BUCKET}/${PREFIX}" \
+            --transfers=32 --checkers=32 --stats=5s --stats-one-line -v
 
-          # 全ての並列アップロードを待機
-          wait
+          # 公開ドメインはディレクトリの URL から index.html を自動で解決しない。
+          # docs のリンクは末尾スラッシュ (/docs/development/game-test/) なので、各 index.html を
+          # 末尾スラッシュのキーとしても置き、リンク先や直接開いた URL が 404 にならないようにする
+          find ./upload/docs -name index.html -print0 \
+            | xargs -0 -P 16 -I {} sh -c '
+                relative="${1#./upload/docs/}"
+                aws s3api put-object \
+                  --bucket "$S3_UPLOAD_BUCKET" \
+                  --key "$PREFIX/docs/${relative%index.html}" \
+                  --body "$1" \
+                  --content-type "text/html; charset=utf-8" \
+                  --endpoint-url "$S3_ENDPOINT" > /dev/null
+              ' _ {}
+
           echo "S3 upload completed"
 
   # コメント作成ジョブ
