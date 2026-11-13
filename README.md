@@ -13,20 +13,37 @@ morinoparty の Minecraft プラグインテンプレートです。Paper / Velo
 
 ## 技術スタック
 
-- **Kotlin** - 言語
-- **Paper API** 26.2 - Minecraft サーバー API
-- **Velocity API** 4.1 - Minecraft プロキシ API
+バージョンは執筆時点のものです。最新の値は `gradle/libs.versions.toml` と `docs/package.json` を参照してください (Dependabot が更新します)。
+
+### プラグイン
+
+- **Kotlin** 2.4 / **Java** 25 - 言語・ツールチェーン
+- **Paper API** 26.3 - Minecraft サーバー API (`paper-plugin.yml` の `apiVersion` と開発サーバーは 26.2)
+- **Velocity API** 4.3 - Minecraft プロキシ API
 - **Cloud** - コマンドフレームワーク (Incendo)
 - **Koin** - 依存性注入
 - **MCCoroutine** - Kotlin Coroutines の Minecraft 統合
-- **ShadowJar** - Fat JAR 生成
-- **Fumadocs** - ドキュメントサイト (Next.js)
+- **kotlinx.serialization** - シリアライズ
+- **Shadow** / **run-paper** / **resource-factory** - JAR 生成・開発サーバー・`paper-plugin.yml` / `velocity-plugin.json` の生成
+
+### テスト・品質管理
+
+- **JUnit** / **MockK** / **MockBukkit** / **koin-test** - ユニットテスト
+- **[fukurou](https://github.com/morinoparty/fukurou)** - 実際の Paper サーバーとクライアントで動かす in-game テスト (`game-test/`)
+- **ktlint** / **detekt** / **Spotless** (ライセンスヘッダー) / **Dokka** (API ドキュメント)
+
+### ドキュメントサイト (`docs/`)
+
+- **[Fumadocs](https://fumadocs.dev/)** - ドキュメントフレームワーク
+- **[TanStack Start](https://tanstack.com/start)** - React フレームワーク (静的サイトとしてプリレンダー)
+- **[Vite+](https://viteplus.dev/)** (`vp`) - 開発サーバー・ビルド・フォーマット・リント
+- **[Chlorophyll](https://www.npmjs.com/package/@morinoparty/chlorophyll-react)** (`@morinoparty/chlorophyll-react`) - morinoparty のデザインシステム。デザイントークンを Panda CSS のプリセットから生成します
 
 ## 必要環境
 
 - **Java** 25 (Temurin 推奨)
 - **Gradle** 9.x (Wrapper 同梱)
-- **Node.js** 26+ / **pnpm** 10+ (ドキュメントビルド用)
+- **Node.js** 26 / **pnpm** 10.26.1 (ドキュメントビルド用。pnpm の版は `docs/package.json` の `packageManager` で固定)
 - **[Task](https://taskfile.dev/)** (タスクランナー、任意)
 
 ## セットアップ
@@ -52,23 +69,27 @@ GitHub の "Use this template" ボタンからリポジトリを作成するか�
 
 # 3. クラス名の変更
 #    PluginName → MyPlugin
+#    PluginNameLoader / PluginNameBootstrap → MyPluginLoader / MyPluginBootstrap
 #    PluginNameAPI → MyPluginAPI
 #    PluginNameCommon → MyPluginCommon
 
 # 4. 設定ファイルの更新
-#    - paper/build.gradle.kts: main クラスのパス、website URL
-#    - velocity PluginName.kt: @Plugin アノテーションの id, name
+#    - paper/build.gradle.kts: paperPluginYaml (main / bootstrapper / loader のクラスパス、website)
+#    - velocity/build.gradle.kts: velocityPluginJson (id / main / description / authors)
 #    - .agent/rules/: プロジェクト名、リポジトリ URL (CLAUDE.md / AGENTS.md は task agent で生成)
-#    - docs/app/layout.tsx: メタデータ
-#    - docs/app/layout.config.tsx: タイトル、GitHub URL
+#    - docs/src/lib/shared.ts: サイト名、GitHub リポジトリ、Modrinth URL
+#    - docs/src/routes/__root.tsx: <title> と description
+#    - docs/content/docs/meta.json: title (llms.txt の見出し)
 #    - .github/workflows/preview.yml: PROJECT_NAME
 #    - .github/workflows/upload.yml: JAR ファイル名
+#    - game-test/scenarios/hello.json: コマンド名と期待するメッセージ
 ```
 
 ### 3. AI エージェント向け指示ファイルの生成
 
 `CLAUDE.md` / `AGENTS.md` は `.agent/rules/` から生成されるファイルで、git には含めていません (`.gitignore` 済み)。
-`.agent/rules/` を編集したら再生成してください。
+クローン直後や新しい worktree を作成した直後、`.agent/rules/` を編集したあとに生成してください。
+人格や汎用的なルールは各自のマシンのグローバル設定で管理し、`.agent/rules/` にはこのリポジトリ固有のルールだけを置きます。
 
 ```bash
 bash .agent/build.sh
@@ -77,15 +98,23 @@ bash .agent/build.sh
 task agent
 ```
 
+[Orca](https://github.com/stablyai/orca) で worktree を作成する場合は、リポジトリ設定の Setup Script でこの生成を自動化できます。
+詳しくはドキュメントの「Orca のセットアップ」(`docs/content/docs/development/orca-setup.mdx`) を参照してください。
+
 ### 4. ビルド
 
 ```bash
-# Gradle ビルド
+# Gradle ビルド (ユニットテストも実行される)
+./gradlew build
+
+# テストを省略する場合
 ./gradlew build -x test
 
-# または Task を使用
+# または Task を使用 (clean build)
 task build
 ```
+
+Paper 向けの JAR は `paper/build/libs/*-all.jar`、Velocity 向けの JAR は `velocity/build/libs/*-all.jar` に出力されます。
 
 ### 5. 開発サーバー起動
 
@@ -99,14 +128,26 @@ task run
 
 ### 6. ドキュメント開発
 
+`docs/` は単独の pnpm プロジェクトです (Fumadocs + TanStack Start + Vite+)。
+
 ```bash
 cd docs
 pnpm install
-pnpm dev
+pnpm dev          # 開発サーバー (http://localhost:3000/)
+
+pnpm check        # フォーマット・リント (vp check --fix)
+pnpm check:ci     # フォーマット・リントの検証のみ (vp check)
+pnpm typecheck    # 型チェック (tsc --noEmit)
+pnpm build        # 静的サイトを docs/out に出力 (vp build)
 
 # または Task を使用
-task docs
+task docs         # pnpm install + pnpm dev
+task docs:build   # pnpm install + pnpm build
 ```
+
+ドキュメントはサイトのルート (`BASE_PATH` 直下) に配置され、トップページがそのままドキュメントの最初のページになります。
+サブパスに配置する場合は `BASE_PATH` を指定してビルドします (例: `BASE_PATH=/PluginName/abc1234/docs pnpm build`)。
+Dokka の API ドキュメントは `./gradlew dokkaGenerate` で `docs/public/dokka` に出力され、ビルド時に `docs/out/dokka` にコピーされます。
 
 ## 初期化チェックリスト
 
@@ -117,29 +158,34 @@ task docs
 - [ ] パッケージ名 `party.morino.pluginname` を変更
 - [ ] `common/build.gradle.kts` の `basePackage` をパッケージ名に合わせて変更
 - [ ] ソースディレクトリ名をパッケージ名に合わせてリネーム
-- [ ] クラス名 (`PluginName`, `PluginNameAPI`, `PluginNameCommon`) を変更
-- [ ] `paper/build.gradle.kts` のメインクラスパス・website を変更
-- [ ] `velocity/.../PluginName.kt` の `@Plugin` アノテーションを変更
+- [ ] クラス名 (`PluginName`, `PluginNameLoader`, `PluginNameBootstrap`, `PluginNameAPI`, `PluginNameCommon`) を変更
+- [ ] `paper/build.gradle.kts` の `paperPluginYaml` (main / bootstrapper / loader のクラスパス、website) を変更
+- [ ] `velocity/build.gradle.kts` の `velocityPluginJson` (id / main / description / authors) を変更
 - [ ] `.agent/rules/` のプロジェクト説明とリポジトリ URL を変更し、`task agent` で `CLAUDE.md` / `AGENTS.md` を生成
-- [ ] `docs/app/layout.tsx` のメタデータを変更
-- [ ] `docs/app/layout.config.tsx` のタイトルと GitHub URL を変更
-- [ ] `docs/app/llms.txt/route.ts` のプラグイン名を変更
+- [ ] `docs/src/lib/shared.ts` のサイト名 (`appName`)、GitHub リポジトリ (`gitConfig`)、`modrinthUrl` を変更
+- [ ] `docs/src/routes/__root.tsx` の `title` / `description` を変更
+- [ ] `docs/content/docs/meta.json` の `title` と `docs/content/docs/` の本文を変更
 - [ ] `docs/package.json` の `name` を変更
 - [ ] `.github/workflows/preview.yml` の `PROJECT_NAME` を変更
 - [ ] `.github/workflows/upload.yml` の JAR ファイル名を変更
-- [ ] GitHub リポジトリの Settings で GitHub Pages を有効化
+- [ ] `game-test/scenarios/hello.json` をプラグインのコマンドに合わせて変更
+- [ ] GitHub リポジトリの Settings で GitHub Pages を有効化 (Source は GitHub Actions。公開パスは `deploy_docs.yml` が Pages の設定から取得するため、カスタムドメインの有無で設定を変える必要はない)
 - [ ] GitHub リポジトリの Secrets に S3 認証情報を設定 (プレビュー機能を使う場合)
+- [ ] プレビュー (`preview.yml`) が使う S3 の Organization Secrets (`MORINOPARTY_CI_` から始まる) をリポジトリから参照できるようにする: `MORINOPARTY_CI_AWS_ACCESS_KEY_ID`、`MORINOPARTY_CI_AWS_SECRET_ACCESS_KEY`、`MORINOPARTY_CI_AWS_REGION`、`MORINOPARTY_CI_S3_ENDPOINT`、`MORINOPARTY_CI_S3_UPLOAD_BUCKET`、`MORINOPARTY_CI_S3_PUBLIC_URL` (PR コメントに載せる公開 URL のベース)
+- [ ] GitHub リポジトリの Secrets に `GRADLE_ENCRYPTION_KEY` を設定 (CI で configuration cache を使う場合、任意)
 - [ ] 不要な初期サンプルコード (`ExampleCommand`) を削除
 - [ ] `config/spotless/license-header.kt` の著者名を変更し、`task license` でヘッダーを付け直す
+- [ ] Orca を使う場合は、リポジトリ設定の Setup Script を設定 (ドキュメントの「Orca のセットアップ」を参照)
 
 ## Task コマンド一覧
 
 | コマンド | 説明 |
 |---------|------|
-| `task build` | 全モジュールをビルド |
+| `task build` | 全モジュールをビルド (`./gradlew clean build`、テストを含む) |
 | `task run` | Paper 開発サーバーを起動 |
-| `task docs` | ドキュメント開発サーバーを起動 |
-| `task check` | フォーマット + ビルド |
+| `task docs` | ドキュメント開発サーバーを起動 (`pnpm install` + `pnpm dev`) |
+| `task docs:build` | ドキュメントを静的サイトとしてビルド (`docs/out`) |
+| `task check` | フォーマット (`ktlintFormat`) + ビルド |
 | `task clear` | session.lock ファイルを削除 |
 | `task license` | ライセンスヘッダーを付与・更新 (`spotlessApply`) |
 | `task license:check` | ライセンスヘッダーを検証 (`spotlessCheck`) |
@@ -151,10 +197,10 @@ task docs
 
 | 定数 | 値の由来 | 主な用途 |
 |------|---------|---------|
-| `BuildConstants.VERSION` | `gradle.properties` の `version` | Velocity の `@Plugin(version = ...)` |
+| `BuildConstants.VERSION` | `gradle.properties` の `version` | ログ出力やバージョン表示など |
 
-`const val` なので `@Plugin` のようなアノテーション引数にそのまま使えます。
-Velocity モジュールでは kapt で `@Plugin` を処理して `velocity-plugin.json` を生成しているため、Kotlin ソースだけで Velocity プラグインとして認識されます。
+`const val` なので、アノテーション引数のようにコンパイル時定数が必要な場所でもそのまま使えます。
+なお、Velocity の `velocity-plugin.json` は kapt (`@Plugin` アノテーション) ではなく、`velocity/build.gradle.kts` の `velocityPluginJson` (resource-factory) で生成しています。
 
 ## 実行時ライブラリ
 
@@ -166,11 +212,11 @@ Paper 向けの JAR には Kotlin 標準ライブラリや Koin などの依存�
 
 | ワークフロー | トリガー | 説明 |
 |-------------|---------|------|
-| `check_pull_request.yml` | Pull Request | ビルドチェック・実行時ライブラリがミラーに存在するかの確認 |
-| `preview.yml` | Pull Request | プレビュービルド・S3 アップロード・PR コメント |
-| `upload.yml` | Release published | GitHub Release にJAR をアップロード |
-| `release.yml` | Push to master | Release Drafter でドラフトリリース作成 |
-| `deploy_docs.yml` | Push to master (docs/) | GitHub Pages にドキュメントデプロイ |
+| `check_pull_request.yml` | Pull Request / Push to main | ビルドチェック・実行時ライブラリがミラーに存在するかの確認・docs の lint / 整形 / 型チェック (`pnpm check:ci` / `pnpm typecheck`) |
+| `preview.yml` | Pull Request | プレビュービルド・fukurou の in-game テスト・S3 アップロード・PR コメント |
+| `upload.yml` | Release published | GitHub Release に JAR をアップロード |
+| `release.yml` | Push to main | Release Drafter でドラフトリリース作成 |
+| `deploy_docs.yml` | Push to main (docs/) | GitHub Pages にドキュメントデプロイ |
 | `dependabot_auto_merge.yml` | Dependabot PR | 自動マージ |
 | `sync-label.yml` | labels.json 変更 | GitHub ラベル同期 |
 

@@ -1,0 +1,51 @@
+---
+title: Orca Setup
+description: Orca で新しい worktree を作成したときに、AI エージェント向けの指示ファイルを自動で生成する設定
+---
+
+# Orca のセットアップ
+
+[Orca](https://github.com/stablyai/orca) では、タスクごとに git の worktree を作成して AI エージェントに作業させます。
+このページでは、新しい worktree を作成したときに必要なファイルを自動で用意するための Setup Script の設定を説明します。
+
+## Setup Script が必要な理由
+
+`CLAUDE.md` / `AGENTS.md` は、`.agent/rules/` のルールファイルを `.agent/build.sh` (`task agent`) で結合して生成するファイルです。
+生成物のため `.gitignore` で git の管理から外しており、新しく作成した worktree には存在しません。
+そのままでは、worktree で起動したエージェントがこのリポジトリのルールを読み込めません。
+
+同じく、`docs/node_modules` も worktree ごとにインストールが必要です。
+
+なお、人格や汎用的なルールは各自のマシンのグローバル設定で管理し、`.agent/rules/` にはこのリポジトリ固有のルールだけを置いています。
+
+## 設定方法
+
+Orca のリポジトリ設定にある **Setup Script** に、次のスクリプトを設定します。
+Setup Script は新しい worktree を作成した後に実行され、環境変数 `$ORCA_WORKTREE_PATH` (作成した worktree のパス) と `$ORCA_ROOT_PATH` を使えます。
+
+```bash
+set -eu
+
+# .agent/rules/ から CLAUDE.md / AGENTS.md を生成する
+bash "$ORCA_WORKTREE_PATH/.agent/build.sh"
+
+# (任意) ドキュメントの依存関係をインストールする
+cd "$ORCA_WORKTREE_PATH/docs"
+pnpm install --frozen-lockfile
+```
+
+`.agent/build.sh` はスクリプト自身の場所からリポジトリのルートを求めるため、どのディレクトリから実行しても worktree の直下に `CLAUDE.md` / `AGENTS.md` を生成します。
+ドキュメントを編集しない場合は、後半の `pnpm install` は省略してかまいません。
+
+Gradle は Wrapper (`./gradlew`) を同梱しているため、事前の準備は必要ありません。
+
+## orca.yaml で設定する場合
+
+Orca は、リポジトリ直下の `orca.yaml` の `scripts.setup` に書いた Setup Script も読み込みます。
+この場合は、初めて実行する前やスクリプトが変更されたときに、実行してよいかの確認が表示されます。
+このテンプレートには `orca.yaml` を含めていないため、上記のリポジトリ設定で設定してください。
+
+## ルールを変更した場合
+
+Setup Script は worktree を作成したときに一度だけ実行されます。
+`.agent/rules/` を変更した場合は、その worktree で `task agent` (または `bash .agent/build.sh`) を実行して、`CLAUDE.md` / `AGENTS.md` を生成し直してください。
