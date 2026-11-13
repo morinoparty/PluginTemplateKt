@@ -42,7 +42,7 @@ val generateBuildConstants by tasks.registering {
 ### CI で configuration cache を使う
 
 configuration cache には秘密情報が含まれる可能性があるため、`setup-gradle` は暗号化キーが設定されている場合にだけ保存・復元します。
-リポジトリのシークレットに `GRADLE_ENCRYPTION_KEY` を登録してください。値は次のコマンドで生成できます。
+Organization (またはリポジトリ) のシークレットに `MORINOPARTY_CI_GRADLE_ENCRYPTION_KEY` を登録してください。値は次のコマンドで生成できます。
 
 ```bash
 openssl rand -base64 16

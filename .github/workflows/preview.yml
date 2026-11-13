@@ -11,15 +11,15 @@ permissions:
   attestations: write
 
 env:
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.MORINOPARTY_CI_AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.MORINOPARTY_CI_AWS_SECRET_ACCESS_KEY }}
   AWS_EC2_METADATA_DISABLED: true
-  AWS_REGION: auto
+  AWS_REGION: ${{ secrets.MORINOPARTY_CI_AWS_REGION }}
   AWS_CLI_FILE_ENCODING: UTF-8
   AWS_DEFAULT_S3_SIGNATURE_VERSION: s3v4
-  S3_UPLOAD_BUCKET: ${{ secrets.S3_UPLOAD_BUCKET }}
-  S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
-  PREVIEW_BASE_URL: ${{ vars.PREVIEW_BASE_URL }}
+  S3_UPLOAD_BUCKET: ${{ secrets.MORINOPARTY_CI_S3_UPLOAD_BUCKET }}
+  S3_ENDPOINT: ${{ secrets.MORINOPARTY_CI_S3_ENDPOINT }}
+  S3_PUBLIC_URL: ${{ secrets.MORINOPARTY_CI_S3_PUBLIC_URL }}
   PROJECT_NAME: PluginName
 
 jobs:
@@ -61,7 +61,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@8379f6a1328ee0e06e2bb424dadb7b159856a326 # v4.4.0
         with:
           # configuration cache を保存・復元するための暗号化キー (未設定なら configuration cache は保存されない)
-          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+          cache-encryption-key: ${{ secrets.MORINOPARTY_CI_GRADLE_ENCRYPTION_KEY }}
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Change wrapper permissions
@@ -127,7 +127,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@8379f6a1328ee0e06e2bb424dadb7b159856a326 # v4.4.0
         with:
           # configuration cache を保存・復元するための暗号化キー (未設定なら configuration cache は保存されない)
-          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+          cache-encryption-key: ${{ secrets.MORINOPARTY_CI_GRADLE_ENCRYPTION_KEY }}
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       # Vite+ (vp)、Node (docs/.node-version)、pnpm (docs/package.json の packageManager) をまとめて入れ、
@@ -302,12 +302,12 @@ jobs:
 
       - name: Create comment file
         env:
-          JAR_DOWNLOAD_BASE: "${{ env.PREVIEW_BASE_URL }}/${{ env.PROJECT_NAME }}/${{ env.COMMIT_SHORT_SHA }}/jars"
-          JUNIT_REPORT_URL: "${{ env.PREVIEW_BASE_URL }}/${{ env.PROJECT_NAME }}/${{ env.COMMIT_SHORT_SHA }}/junit/index.html"
-          GAME_TEST_REPORT_URL: "${{ env.PREVIEW_BASE_URL }}/${{ env.PROJECT_NAME }}/${{ env.COMMIT_SHORT_SHA }}/fukurou/index.html"
-          DETEKT_REPORT_URL: "${{ env.PREVIEW_BASE_URL }}/${{ env.PROJECT_NAME }}/${{ env.COMMIT_SHORT_SHA }}/detekt/detekt.html"
-          DOCS_PREVIEW_URL: "${{ env.PREVIEW_BASE_URL }}/${{ env.PROJECT_NAME }}/${{ env.COMMIT_SHORT_SHA }}/docs/index.html"
-          DOKKA_URL: "${{ env.PREVIEW_BASE_URL }}/${{ env.PROJECT_NAME }}/${{ env.COMMIT_SHORT_SHA }}/docs/dokka/index.html"
+          JAR_DOWNLOAD_BASE: "${{ env.S3_PUBLIC_URL }}/${{ env.PROJECT_NAME }}/${{ env.COMMIT_SHORT_SHA }}/jars"
+          JUNIT_REPORT_URL: "${{ env.S3_PUBLIC_URL }}/${{ env.PROJECT_NAME }}/${{ env.COMMIT_SHORT_SHA }}/junit/index.html"
+          GAME_TEST_REPORT_URL: "${{ env.S3_PUBLIC_URL }}/${{ env.PROJECT_NAME }}/${{ env.COMMIT_SHORT_SHA }}/fukurou/index.html"
+          DETEKT_REPORT_URL: "${{ env.S3_PUBLIC_URL }}/${{ env.PROJECT_NAME }}/${{ env.COMMIT_SHORT_SHA }}/detekt/detekt.html"
+          DOCS_PREVIEW_URL: "${{ env.S3_PUBLIC_URL }}/${{ env.PROJECT_NAME }}/${{ env.COMMIT_SHORT_SHA }}/docs/index.html"
+          DOKKA_URL: "${{ env.S3_PUBLIC_URL }}/${{ env.PROJECT_NAME }}/${{ env.COMMIT_SHORT_SHA }}/docs/dokka/index.html"
           LIMIT_TIME: ${{ env.LIMIT_TIME }}
         run: |
           cat << EOF > comment.md
