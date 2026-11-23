@@ -11,7 +11,7 @@ serialization = "1.13.0"
 ktlint = "14.2.0"
 mockk = "1.14.12"
 junit = "6.1.3"
-mockBukkit = "4.120.0"
+mockBukkit = "4.124.0"
 
 [libraries]
 paper-api = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
